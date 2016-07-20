@@ -1,0 +1,204 @@
+import { Component, ViewChild } from '@angular/core';
+import { ionicBootstrap, Platform, Nav, Toast } from 'ionic-angular';
+import { StatusBar } from 'ionic-native';
+
+import { AboutPage} from './pages/about/about';
+import { HomePage } from './pages/home/home';
+import { DataPage } from './pages/data/data';
+import { BluetoothPage } from './pages/bluetooth/bluetooth';
+
+import { BLService } from './services/blservice/blservice';
+import { HttpService } from './services/httpservice/httpservice';
+import { StorageService } from './services/storageservice/storageservice';
+
+declare var cordova: any; /* tell the compiler not to complain about cordova.
+			     necessary because ionic-native didn't (doesn't?)
+			     have a wrapper for background-mode to import */
+
+@Component({
+    templateUrl: 'build/app.html',
+    providers: [BLService, HttpService, StorageService]
+})
+class MyApp {
+    @ViewChild(Nav) nav: Nav;
+    
+    rootPage: any = HomePage;
+    
+    pages: Array<{title: string, component: any}>; /* All pages of the app */
+    jsons: Array<any>; /* list of postable data points in server format */
+
+
+    constructor(private platform: Platform, 
+		private storage: StorageService, 
+		private blservice: BLService, 
+		private httpservice: HttpService) {
+
+	this.initializeApp();
+	
+	this.pages = [
+	    { title: 'Home', component: HomePage },
+	    { title: 'Data Visualization', component: DataPage },
+	    { title: 'Bluetooth Settings', component: BluetoothPage },
+	    { title: 'About', component: AboutPage }
+	];
+	
+    }
+    
+    initializeApp() {
+	this.platform.ready().then(() => {
+
+	    /* Set heads up notification text for background mode */
+	    cordova.plugins.backgroundMode.setDefaults({                                                                       
+                title: "URSI App",
+                ticker: "",
+                text: "Collecting Data"
+	    });
+
+            /* Enable background mode and set the heads up notification text */
+            //cordova.plugins.backgroundMode.enable();
+
+            /* Initial auto-connect */
+            //this.resumeOperations();
+
+            /* Add listeners for app pause/resume and bind "this" to them */
+            //document.addEventListener("pause",this.pauseOperations.bind(this));
+    
+            //document.addEventListener("resume",this.resumeOperations.bind(this));    
+	    
+            /* Function that regulates periodic server posting */
+            //this.pushTimer();          
+	    
+
+	    StatusBar.styleDefault();
+    });
+  }
+
+    pauseOperations() {
+	/* Ensure that background mode is actually on. 
+	   Especially important after initial call */
+	if (!cordova.plugins.backgroundMode.isActive())
+	    return;
+
+	/* On app leave, disconnect immediately */
+	this.blservice.disconnect();
+
+	/* Every 5 minutes, reconnect with this method */
+	setTimeout(() => {
+	    /* We must scan available devices to see if one                                                            
+               has been connected to last */
+            var scanSub = this.blservice.startScan();  
+            var id;
+	    
+	    /* Retrieve the last used device id from storage */
+            this.storage.retrievePeripheral().then(storedID => {
+
+		id = storedID;
+
+		/* Scan for peripherals and see if a match is found */
+		scanSub.subscribe(device => {
+		    if (device.id == id) {
+			/* If so, connect, and disconnect 30 seconds later */
+			this.blservice.connect(device);
+			/* Propagate paused functionality (next function call will only execute
+			   if background mode is currently active, not just enabled) */
+			setTimeout(() => {
+			    this.pauseOperations();
+			},30000);
+		    }
+		    /* A device was found that we weren't connected to last */
+		    else {}
+		});
+		
+		/* Stop scan after reasonable time */
+		setTimeout(() => {
+		    this.blservice.stopScan();
+		    console.log("Scan finished");
+		}, 6000);
+	    });
+
+	},300000); /* 5 Minute intervals */
+    }
+
+    resumeOperations() {
+	/* On app resume, we must scan available devices to see if one
+	   has been connected to last */
+	var scanSub = this.blservice.startScan();
+	var id;
+	
+	/* Retrieve the last used decive id from storage */
+	this.storage.retrievePeripheral().then(storedID => {
+	    id = storedID;
+	
+	    /* Scan for peripherals and see if a match is found */
+	    scanSub.subscribe(device => {
+		if (device.id == id) {
+		    /* If so, notify and connect as usual */
+		    this.blservice.connect(device);
+		    let toast = Toast.create({
+			message: "Connected to " + device.name,
+			duration: 2000,
+			position: 'bottom',
+			showCloseButton: true
+                    });
+                    this.nav.present(toast);
+		}
+		/* A device was found that we weren't connected to last */
+		else {}
+	    });
+	    
+	    /* Stop scan after reasonable time */
+	    setTimeout(() => {
+		this.blservice.stopScan();
+		console.log("Scan finished");
+	    }, 6000);
+	});
+    }
+    
+    /* Regulate periodic posting to the server */
+    pushTimer() {
+	setTimeout(() =>  {
+	    this.jsons = [];
+	    
+	    /* Grab all the data from storage */
+	    this.storage.retrieve().then(
+		data => {
+		    /* If successful, cycle through and create an array of JSONs
+		       in the correct format for the server to read */
+		    for (var i = 0; i < data.res.rows.length; i++) {
+			this.jsons.push(this.httpservice.createJSON(
+			    data.res.rows.item(i).value,
+			    new Date(data.res.rows.item(i).date)));
+		    }
+		    /* If there's any data, we want to post it */
+		    if (this.jsons.length > 0) {
+			var self = this;
+			this.httpservice.makePostRequest(this.jsons, function() {
+			    /* Success callback if the data was posted. Clear out the storage */
+			    self.storage.clear();
+			    self.storage.makeTable();
+			    let toast = Toast.create({
+				message: "Data posted to server",
+				duration: 2000,
+				position: 'bottom',
+				showCloseButton: true
+			    });
+			    self.nav.present(toast);
+			});
+		    }
+		}, err => {
+		    console.log("Error");
+		}
+	    );
+	    /* Repeat this function again in 5 minutes */
+	    this.pushTimer();
+	}, 300000);
+    }
+
+
+    /* Open specified page by the side menu */
+    openPage(page) {
+	this.nav.setRoot(page.component);
+    }
+}
+
+ionicBootstrap(MyApp);

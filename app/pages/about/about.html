@@ -1,0 +1,24 @@
+<ion-header>
+  <ion-navbar favorite>
+    <button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title>About</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding class="about">
+
+  <ion-slides pager>
+    <ion-slide *ngFor="let slide of slides">
+      <img style="max-height:45vh" [src]="slide.image" class="slide-image"/>
+      <h2 class="slide-title" [innerHTML]="slide.title"></h2>
+      <p [innerHTML]="slide.description"></p>
+    </ion-slide>
+    <ion-slide>
+      <h1 class="slide-title">Now go get started!</h1>
+      <button class="bottom-button" large outline (click)="aboutAlert()">App Info</button>
+    </ion-slide>
+  </ion-slides>
+
+</ion-content>

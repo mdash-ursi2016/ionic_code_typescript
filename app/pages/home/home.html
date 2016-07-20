@@ -1,0 +1,32 @@
+<ion-header>
+  <ion-navbar favorite>
+    <button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title>
+      Home Page
+    </ion-title>
+  </ion-navbar>
+</ion-header>
+
+
+<ion-content padding class="home">
+
+
+  <h3><center>Welcome to the URSI App</center></h3>
+  <h6 id="instruct"><center>Head to the About Page for startup instructions</center></h6>
+
+  <br>
+
+  <p id="content" style="color:#4BC0C0;font-size:400%;"><center>BPM</center></p>
+
+
+  <canvas #myCanvas2 id="myCanvas" width={{canvasWidth}} height={{canvasHeight}} style="background-color:black; border:1px solid #000000;">
+  </canvas>
+
+  <br>
+  <br>
+
+  <p id="msg"><center> To display an EKG measurement, first connect to a device via Bluetooth Settings</center></p>
+
+</ion-content>
