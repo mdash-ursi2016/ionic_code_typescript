@@ -4,9 +4,10 @@ import { NavController, Alert } from 'ionic-angular';
 @Component({
   templateUrl: 'build/pages/about/about.html'
 })
+
 export class AboutPage {
 
-    slides: Array<{title: string, description: string, image: string}>;;
+    slides: Array<{title: string, description: string, image: string}>; /* Slide array for *ngFor */
 
     constructor(private nav: NavController) {
 	
@@ -43,6 +44,7 @@ tically displayed. Clicking <b>+/-</b> will zoom in and out out and the <b><-/->
 	
     }
 
+    /* Alert for the app information */
     aboutAlert() {                                                                                                                    
         let alert = Alert.create({                                                                                                    
             title: 'App Info',                                                                                                        

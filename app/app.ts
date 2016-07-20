@@ -11,7 +11,7 @@ import { BLService } from './services/blservice/blservice';
 import { HttpService } from './services/httpservice/httpservice';
 import { StorageService } from './services/storageservice/storageservice';
 
-declare var cordova: any; /* tell the compiler not to complain about cordova.
+declare var cordova: any; /* tell the transpiler not to complain about cordova.
 			     necessary because ionic-native didn't (doesn't?)
 			     have a wrapper for background-mode to import */
 
@@ -19,6 +19,7 @@ declare var cordova: any; /* tell the compiler not to complain about cordova.
     templateUrl: 'build/app.html',
     providers: [BLService, HttpService, StorageService]
 })
+
 class MyApp {
     @ViewChild(Nav) nav: Nav;
     
@@ -61,8 +62,7 @@ class MyApp {
             //this.resumeOperations();
 
             /* Add listeners for app pause/resume and bind "this" to them */
-            //document.addEventListener("pause",this.pauseOperations.bind(this));
-    
+            //document.addEventListener("pause",this.pauseOperations.bind(this));    
             //document.addEventListener("resume",this.resumeOperations.bind(this));    
 	    
             /* Function that regulates periodic server posting */
@@ -84,19 +84,13 @@ class MyApp {
 
 	/* Every 5 minutes, reconnect with this method */
 	setTimeout(() => {
-	    /* We must scan available devices to see if one                                                            
-               has been connected to last */
-            var scanSub = this.blservice.startScan();  
-            var id;
-	    
+
 	    /* Retrieve the last used device id from storage */
             this.storage.retrievePeripheral().then(storedID => {
 
-		id = storedID;
-
 		/* Scan for peripherals and see if a match is found */
-		scanSub.subscribe(device => {
-		    if (device.id == id) {
+		this.blservice.startScan().subscribe(device => {
+		    if (device.id == storedID) {
 			/* If so, connect, and disconnect 30 seconds later */
 			this.blservice.connect(device);
 			/* Propagate paused functionality (next function call will only execute
@@ -122,16 +116,14 @@ class MyApp {
     resumeOperations() {
 	/* On app resume, we must scan available devices to see if one
 	   has been connected to last */
-	var scanSub = this.blservice.startScan();
-	var id;
-	
+
+
 	/* Retrieve the last used decive id from storage */
 	this.storage.retrievePeripheral().then(storedID => {
-	    id = storedID;
 	
 	    /* Scan for peripherals and see if a match is found */
-	    scanSub.subscribe(device => {
-		if (device.id == id) {
+	    this.blservice.startScan().subscribe(device => {
+		if (device.id == storedID) {
 		    /* If so, notify and connect as usual */
 		    this.blservice.connect(device);
 		    let toast = Toast.create({
@@ -164,14 +156,14 @@ class MyApp {
 		data => {
 		    /* If successful, cycle through and create an array of JSONs
 		       in the correct format for the server to read */
-		    for (var i = 0; i < data.res.rows.length; i++) {
+		    for (let i = 0; i < data.res.rows.length; i++) {
 			this.jsons.push(this.httpservice.createJSON(
 			    data.res.rows.item(i).value,
 			    new Date(data.res.rows.item(i).date)));
 		    }
 		    /* If there's any data, we want to post it */
 		    if (this.jsons.length > 0) {
-			var self = this;
+			let self = this;
 			this.httpservice.makePostRequest(this.jsons, function() {
 			    /* Success callback if the data was posted. Clear out the storage */
 			    self.storage.clear();

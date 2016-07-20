@@ -9,10 +9,12 @@
 
 
 <ion-content padding class="bluetooth">
-  
+
+  <!-- Connection control buttons -->
   <button block dark (click)="scan()">Scan for Devices</button>
   <button id="dc" block stable (click)="disconnect()">Disconnect from Device</button>
 
+  <!-- List of found devices upon scan -->
   <ion-list>
     <ion-item *ngFor="let item of deviceList">
       <p>{{item.rssi}}</p>
@@ -24,12 +26,11 @@
 
 </ion-content>
  
-
-
 <ion-footer>
 
-
+  <!-- App settings -->
   <ion-list>
+    <!-- Range for time to scan for -->
     <ion-list-header>
       Scan Time
       <ion-badge favorite item-right>{{scanTime}}</ion-badge>
@@ -40,10 +41,14 @@
 	<ion-icon range-right name="timer"></ion-icon>
       </ion-range>
     </ion-item>
+
+    <!-- Enabling/Disabling Background Mode -->
     <ion-item>
       <ion-label>Background Mode</ion-label>
       <ion-toggle checked="bgToggled" [(ngModel)]="bgToggled" (ionChange)="bgToggle()"></ion-toggle>
     </ion-item>
+
+    <!-- Current status of scan -->
     <ion-item>
       <h3 style="text-align:center;font-family:Arial;color:#333399"><b>Status: {{statusDiv}}</b></h3>
     </ion-item>

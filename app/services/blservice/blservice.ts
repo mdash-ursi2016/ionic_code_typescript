@@ -1,8 +1,9 @@
-import {BLE, Vibration} from 'ionic-native';
-import {StorageService} from '../storageservice/storageservice';
-import {Injectable} from '@angular/core';
-import {Events} from 'ionic-angular';
-import {HttpService} from '../httpservice/httpservice';
+import { BLE, Vibration} from 'ionic-native';
+import { Injectable } from '@angular/core';
+import { Events } from 'ionic-angular';
+
+import { StorageService } from '../storageservice/storageservice';
+import { HttpService } from '../httpservice/httpservice';
 
 @Injectable()
 export class BLService {
@@ -17,13 +18,13 @@ export class BLService {
 
 
     constructor(private storage: StorageService, private events: Events, private httpservice: HttpService) {
-	this.scanInfo = { service: 'aa7b3c40-f6ed-4ffc-bc29-5750c59e74b3', /* Heart rate service */
-			  heartrate: 'b0351694-25e6-4eb5-918c-ca9403ddac47', /* Heart rate characteristic */
-			  ekg: '1bf9168b-cae4-4143-a228-dc7850a37d98', /* EKG characteristic */
-			  timechar: '95d344f4-c6ad-48d8-8877-661ab4d41e5b', /* Date write characteristic */
-			  heartratebundle: '3cd43730-fc61-4ea7-aa18-6e7c3d798d74',
-			  datecheck: '3750215f-b147-4bdf-9271-0b32c1c5c49d',
-			  timeout: 3 }; /* Scan time in seconds */
+	this.scanInfo = { 
+	    service: 'aa7b3c40-f6ed-4ffc-bc29-5750c59e74b3', /* Heart rate service */
+	    heartrate: 'b0351694-25e6-4eb5-918c-ca9403ddac47', /* Heart rate - [4 byte date, 1 byte bpm] */ 
+	    ekg: '1bf9168b-cae4-4143-a228-dc7850a37d98', /* EKG characteristic - [[14 x 1 byte EKG]] */
+	    heartratebundle: '3cd43730-fc61-4ea7-aa18-6e7c3d798d74', /* BPM bundle characteristic [4x 4 byte date, 1 byte bpm] */
+	    datecheck: '3750215f-b147-4bdf-9271-0b32c1c5c49d' /* Verifying timestamp characteristic [4 byte date] */
+	};
     }
 
     /* Return a Promise for if Bluetooth is enabled or not */
@@ -36,7 +37,7 @@ export class BLService {
 	return BLE.enable();
     }
 
-    /* Return a pair including the scan timeout and the scan subscription */
+    /* Return the scan subscription */
     startScan() {
         return BLE.startScan([this.scanInfo.service]);
     }
@@ -61,15 +62,20 @@ export class BLService {
 
     /* Record incoming data in storage */
     connected(peripheral) {
+
 	/* Inform the peripheral of the current date */
 	this.sendDate(peripheral);
+
 	/* Subscription for the heart rate (BPM) */
 	this.HRsubscription = BLE.startNotification(peripheral.id, this.scanInfo.service, this.scanInfo.heartrate);
+
 	/* Subscription for the EKG data */
 	this.EKGsubscription = BLE.startNotification(peripheral.id, this.scanInfo.service, this.scanInfo.ekg);
+
 	/* Subscription for the bundle data */
 	this.HRBundlesubscription = BLE.startNotification(peripheral.id, this.scanInfo.service, this.scanInfo.heartratebundle);
 
+	/* Subscription for date verification */
 	this.dateChecksubscription = BLE.startNotification(peripheral.id, this.scanInfo.service, this.scanInfo.datecheck);
 
 	/* Subscribe to the BPM */
@@ -164,9 +170,9 @@ export class BLService {
 	uint8[3] = (time & 0xFF000000) >>> 24;
 
 	/* Write the data to the peripheral */
-	BLE.write(peripheral.id, this.scanInfo.service, this.scanInfo.timechar, uint8.buffer).then(
-	    succ => {console.log(JSON.stringify(succ));},
-	    fail => {console.log(JSON.stringify(fail));}
+	BLE.write(peripheral.id, this.scanInfo.service, this.scanInfo.datecheck, uint8.buffer).then(
+	    succ => console.log("Time written"),
+	    fail => console.log("Time not written successfully")
 	);
 
     }

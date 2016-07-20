@@ -1,13 +1,15 @@
 import { Component } from '@angular/core';
-import {Page, NavController, Toast} from 'ionic-angular';
+import { Page, NavController, Toast } from 'ionic-angular';
+import { DatePicker } from 'ionic-native';
+
+import { StorageService } from '../../services/storageservice/storageservice';
+import { HttpService } from '../../services/httpservice/httpservice';
 import * as chart from 'chart.js';
-import {StorageService} from '../../services/storageservice/storageservice';
-import {HttpService} from '../../services/httpservice/httpservice';
-import {DatePicker} from 'ionic-native';
 
 @Component({
   templateUrl: 'build/pages/data/data.html'
 })
+
 export class DataPage {
 
     canvasWidth: number; /* Width and height of the chart.js graph */
@@ -55,10 +57,10 @@ export class DataPage {
     
     /* Turn the given date into local ISO time */
     formatLocalDate(dt) {
-        var tzo: any = -dt.getTimezoneOffset(),
+        let tzo: any = -dt.getTimezoneOffset(),
         dif = tzo >= 0 ? '+' : '-',
         pad = function(num) {
-            var norm = Math.abs(Math.floor(num));
+            let norm = Math.abs(Math.floor(num));
             return (norm < 10 ? '0' : '') + norm;
         };
 	return dt.getFullYear() 
@@ -89,34 +91,37 @@ export class DataPage {
     }
 
 
+    /* Store the current date and a random number 1-100.
+       Testing purposes */
     store() {
-	/* Store the current date and a random number 1-100 */
 	this.storage.store(new Date(),Math.floor(Math.random() * 100) + 1);
     }
 
+
     /* Retrieve a fixed amount of data from storage and show the graph */
     retrieve() {
+
 	/* Get the dates from the Datetime Ionic component and create a Date() object */
 	let s1 = this.strParse(this.startDateString);
 	let s2 = this.strParse(this.endDateString);
 
 	/* The parse function separates ISO 8601 times into individual components */
-	var d1 = new Date(s1[0],s1[1],s1[2],s1[3],s1[4]).toISOString();
-	var d2 = new Date(s2[0],s2[1],s2[2],s2[3],s2[4]).toISOString();
+	let d1 = new Date(s1[0],s1[1],s1[2],s1[3],s1[4]).toISOString();
+	let d2 = new Date(s2[0],s2[1],s2[2],s2[3],s2[4]).toISOString();
 	
 	/* Clear out the graph data */
 	this.labels = [];
 	this.db = [];
 
-	var self = this;
+	let self = this;
 
 	/* Make a get request, with a callback function for graphing */
 	this.httpservice.makeGetRequest(d1,d2, function(dates) {
 
 	    /* Magic parsing techniques for the return value */
 	    dates = JSON.parse(dates._body);
-	    for (var i = 0; i < dates.length; i++) {
-		var dtStr = dates[i].header.creation_date_time.toString();
+	    for (let i = 0; i < dates.length; i++) {
+		let dtStr = dates[i].header.creation_date_time.toString();
 		dtStr = dtStr.slice(5,10) + " " + dtStr.slice(11,16);
 		/* Push all of the dates as labels and values as points */
 		self.labels.push(dtStr);
@@ -149,6 +154,115 @@ export class DataPage {
 	this.db = [];
 	this.makeChart();
     }
+
+
+    /* Chart.js graph routine */
+    makeChart() {
+	let canvas: any = document.getElementById("chart");
+	let ctx = canvas.getContext("2d");
+	let myChart = new chart(ctx, {
+	    type: 'line',
+	    data: {
+		labels: this.labels, /* data labels */
+		datasets: [{
+		    label: "Heart Rate",
+		    fill: false,
+		    lineTension: 0.1,
+		    backgroundColor: "rgba(75,192,192,0.4)",
+		    borderColor: "rgba(75,192,192,1)",
+		    borderCapStyle: 'butt',
+		    borderDash: [],
+		    borderDashOffset: 0.0,
+		    borderJoinStyle: 'miter',
+		    pointBorderColor: "rgba(75,192,192,1)",
+		    pointBackgroundColor: "#fff",
+		    pointBorderWidth: 1,
+		    pointHoverRadius: 5,
+		    pointHoverBackgroundColor: "rgba(75,192,192,1)",
+		    pointHoverBorderColor: "rgba(220,220,220,1)",
+		    pointHoverBorderWidth: 2,
+		    pointRadius: 1,
+		    pointHitRadius: 10,
+		    data: this.db, /* data points */
+		    borderWidth: 1
+		}]
+	    },
+	    options: {
+		legend: {
+		    labels: {
+			boxWidth: 12 /* Width of legend box */
+		    }
+		},
+		scales: {
+		    xAxes: [{
+			ticks: {
+			    maxTicksLimit: 20 /* Max dates to label */
+			}
+		    }]
+		}
+	    }
+	});
+    }
+
+    /* Convert a millisecond time to days, hours, minutes, seconds.
+       Used for displaying the current time interval */
+    convertMS(ms) {
+	let d, h, m, s;
+	s = Math.floor(ms / 1000);
+	m = Math.floor(s / 60);
+	s = s % 60;
+	h = Math.floor(m / 60);
+	m = m % 60;
+	d = Math.floor(h / 24);
+	h = h % 24;
+	return "D: " + d + ", H: " + h + ", M: " + m + ", S: " + s;
+    }
+    
+
+    /* Parse an ISO string into its components */
+    strParse(str) {
+	return [
+	    parseInt(str.slice(0,4)), /* Year */
+	    parseInt(str.slice(5,7)) - 1, /* Month */
+	    parseInt(str.slice(8,10)), /* Day */
+	    parseInt(str.slice(11,13)), /* Hour */
+	    parseInt(str.slice(14,16)) /* Minute */
+	];
+    }
+    
+    /* Allow the user to manually set the start date with a DatePicker */
+    startDatePicker() {
+	DatePicker.show({
+	    date: this.startDate,
+	    mode: 'datetime',
+	    androidTheme: 2
+	}).then(
+	    date => {
+		this.startDate = date;
+		this.startDateString = this.formatLocalDate(date);
+	    },
+	    err => console.log("Error occurred while getting date:", err)
+	);
+	this.timeDiff = Math.abs(this.startDate - this.endDate);
+
+    }
+
+    /* Allow the user to manually set the end date with a DatePicker */
+    endDatePicker() {
+        DatePicker.show({
+            date: this.endDate,
+            mode: 'datetime',
+            androidTheme: 2
+        }).then(
+            date => {
+                this.endDate = date;
+                this.endDateString = this.formatLocalDate(date);
+            },
+            err => console.log("Error occurred while getting date:", err)
+        );
+	this.timeDiff = Math.abs(this.startDate - this.endDate);
+    }
+
 
     /* Whatever the current time interval is, divide it by 2 and add it the left bound.
        Then redisplay the graph */
@@ -197,116 +311,7 @@ export class DataPage {
 	this.endDateString = this.formatLocalDate(this.endDate);
 	this.retrieve();
     }
-	
-    
 
 
-
-
-    /* Chart.js graph routine */
-    makeChart() {
-	let canvas: any = document.getElementById("chart");
-	let ctx = canvas.getContext("2d");
-	let myChart = new chart(ctx, {
-	    type: 'line',
-	    data: {
-		labels: this.labels,
-		datasets: [{
-		    label: "Heart Rate",
-		    fill: false,
-		    lineTension: 0.1,
-		    backgroundColor: "rgba(75,192,192,0.4)",
-		    borderColor: "rgba(75,192,192,1)",
-		    borderCapStyle: 'butt',
-		    borderDash: [],
-		    borderDashOffset: 0.0,
-		    borderJoinStyle: 'miter',
-		    pointBorderColor: "rgba(75,192,192,1)",
-		    pointBackgroundColor: "#fff",
-		    pointBorderWidth: 1,
-		    pointHoverRadius: 5,
-		    pointHoverBackgroundColor: "rgba(75,192,192,1)",
-		    pointHoverBorderColor: "rgba(220,220,220,1)",
-		    pointHoverBorderWidth: 2,
-		    pointRadius: 1,
-		    pointHitRadius: 10,
-		    data: this.db,
-		    borderWidth: 1
-		}]
-	    },
-	    options: {
-		legend: {
-		    labels: {
-			boxWidth: 12
-		    }
-		},
-		scales: {
-		    xAxes: [{
-			ticks: {
-			    maxTicksLimit: 20
-			}
-		    }]
-		}
-	    }
-	});
-    }
-
-    /* Convert a millisecond time to days, hours, minutes, seconds.
-       Used for displaying the current time interval */
-    convertMS(ms) {
-	var d, h, m, s;
-	s = Math.floor(ms / 1000);
-	m = Math.floor(s / 60);
-	s = s % 60;
-	h = Math.floor(m / 60);
-	m = m % 60;
-	d = Math.floor(h / 24);
-	h = h % 24;
-	return "D: " + d + ", H: " + h + ", M: " + m + ", S: " + s;
-    }
-    
-    /* Parse an ISO string into its components */
-    strParse(str) {
-	return [
-	    parseInt(str.slice(0,4)), /* Year */
-	    parseInt(str.slice(5,7)) - 1, /* Month */
-	    parseInt(str.slice(8,10)), /* Day */
-	    parseInt(str.slice(11,13)), /* Hour */
-	    parseInt(str.slice(14,16)) /* Minute */
-	];
-    }
-    
-    /* Allow the user to manually set the start date with a DatePicker */
-    startDatePicker() {
-	DatePicker.show({
-	    date: this.startDate,
-	    mode: 'datetime',
-	    androidTheme: 2
-	}).then(
-	    date => {
-		this.startDate = date;
-		this.startDateString = this.formatLocalDate(date);
-	    },
-	    err => console.log("Error occurred while getting date:", err)
-	);
-	this.timeDiff = Math.abs(this.startDate - this.endDate);
-
-    }
-
-    /* Allow the user to manually set the end date with a DatePicker */
-    endDatePicker() {
-        DatePicker.show({
-            date: this.endDate,
-            mode: 'datetime',
-            androidTheme: 2
-        }).then(
-            date => {
-                this.endDate = date;
-                this.endDateString = this.formatLocalDate(date);
-            },
-            err => console.log("Error occurred while getting date:", err)
-        );
-	this.timeDiff = Math.abs(this.startDate - this.endDate);
-    }
 
 }

@@ -1,9 +1,12 @@
 import { Component } from '@angular/core';
-import {Page, Alert, NavController, Loading, Range, Toast} from 'ionic-angular';
-import {BLService} from '../../services/blservice/blservice';
-import {StorageService} from '../../services/storageservice/storageservice';
+import { Page, Alert, NavController, Loading, Range, Toast } from 'ionic-angular';
 
-declare var cordova: any;
+import { BLService } from '../../services/blservice/blservice';
+import { StorageService } from '../../services/storageservice/storageservice';
+
+declare var cordova: any; /* tell the transpiler not to complain about cordova.
+                             necessary because ionic-native didn't (doesn't?)
+                             have a wrapper for background-mode to import */
 
 @Component({
   templateUrl: 'build/pages/bluetooth/bluetooth.html'
@@ -24,22 +27,21 @@ export class BluetoothPage {
 	this.scanTime = 3;
     }
 
-
+    
     ionViewLoaded()
     {
-
-	/* Ensuring that Bluetooth is on */
 	this.statusDiv = "Initializing";
-	var self = this;
-	document.addEventListener('deviceready', function () {
+
+	/* Attempt to enable Bluetooth if it is not already enabled */
+	document.addEventListener('deviceready', () => {
 	    /* If already enabled, do nothing */
-	    self.bl.isEnabled().then(
-		function() {},
-		function() {
+	    this.bl.isEnabled().then(
+		() => {},
+		() => {
 		    /* Otherwise, attempt to enable */
-		    self.bl.enable().then(
-			function() {},
-			function() {alert ("Bluetooth could not be enabled");}
+		    this.bl.enable().then(
+			() => {},
+			() => {alert ("Bluetooth could not be enabled");}
 		    );
 		}
 	    );
@@ -58,9 +60,6 @@ export class BluetoothPage {
 	/* The list of found devices should be empty on scan start */
 	this.deviceList = [];
 	this.statusDiv = "Scanning";
-
-	/* BL scanning service returns a [timeout,subscription] pair */
-	var scanSub = this.bl.startScan();
 	
 	/* Create a loader for during the scan */
 	let loading = Loading.create({
@@ -70,7 +69,7 @@ export class BluetoothPage {
 	this.nav.present(loading);
 
 	/* Subscribe to the scanner, and add each found device to the list */
-	scanSub.subscribe(device => {
+	this.bl.startScan().subscribe(device => {
 	    this.deviceList.push(device);
 	});
 
@@ -82,12 +81,13 @@ export class BluetoothPage {
 	}, 1000 * this.scanTime);
     }
 
+
     /* Executed when a user selects a device from the list;
        Connect to that device */
     connect(device) {
 	this.bl.connect(device);
 
-	/* Remove the device from the list of displayed devices */
+	/* Clear out the device list */
 	this.deviceList = [];
 	this.statusDiv = "Connected to " + device.name;
     }
@@ -101,7 +101,7 @@ export class BluetoothPage {
 
     /* Toggle for enabling and disabling background mode */
     bgToggle() {
-	/* If already enabled, disable, change button HTML, notify user */
+	/* If already enabled, disable, notify user */
         if (cordova.plugins.backgroundMode.isEnabled()) {
             cordova.plugins.backgroundMode.disable();
             let toast = Toast.create({
@@ -112,7 +112,7 @@ export class BluetoothPage {
             });
             this.nav.present(toast);
         }
-        /* Otherwise already disabled, so enable, change button HTML, notify user */
+        /* Otherwise already disabled, so enable, notify user */
         else {
             cordova.plugins.backgroundMode.enable();
             let toast = Toast.create({

@@ -3,13 +3,14 @@
     <button menuToggle>
       <ion-icon name="menu"></ion-icon>
     </button>
-    <ion-title>Data Page</ion-title>
+    <ion-title>Data Visualization</ion-title>
   </ion-navbar>
 </ion-header>
 
 
 <ion-content padding class="data">
 
+  <!-- Date pickers, disabled to simply display dates -->
   <ion-item>
     <ion-label>Start Date</ion-label>
     <ion-datetime displayFormat="MMM DD, h:mm A" disabled [(ngModel)]="startDateString"></ion-datetime>
@@ -23,39 +24,38 @@
 
   <br>
 
-
+  <!-- Buttons for various graph plotting functions -->
   <button small royal round (click)="store()">Store</button>
   <button small secondary round (click)="retrieve()">Retrieve</button>
   <button small danger round (click)="clear()">Clear</button>  
 
   <br>
 
+  <!-- Display the current amount of time displayed on the graph -->
   <p> The current time interval is {{convertMS(timeDiff)}} </p>
 
+
+  <!-- Buttons for various graph display settings -->
   <button clear (click)="zoomIn()">
     <ion-icon name="add"></ion-icon>
   </button>
-
   <button clear (click)="zoomOut()">
     <ion-icon name="remove"></ion-icon>
   </button>
-
   <button clear (click)="shiftLeft()">
     <ion-icon name="arrow-round-back"></ion-icon>
   </button>
-
   <button clear (click)="shiftRight()">
     <ion-icon name="arrow-round-forward"></ion-icon>
   </button>
 
+  <!-- DatePicker plugin buttons -->
   <button small dark (click)="startDatePicker()">Start</button>
   <button small dark (click)="endDatePicker()">End</button>
   
   <br>
 
   <canvas id="chart" width={{canvasWidth}} height={{canvasHeight}}>Charts not supported</canvas>
-
-
 
 </ion-content>
 
