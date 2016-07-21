@@ -50,7 +50,7 @@ export class BLService {
     /* Connect to the given device, and set the peripheral for later */
     connect(peripheral) {
 	Vibration.vibrate(100);
-	var connectSub = BLE.connect(peripheral.id).subscribe(result => {
+	let connectSub = BLE.connect(peripheral.id).subscribe(result => {
 	    this.storage.storePeripheral(peripheral.id);
 	    this.peripheral = peripheral;
             this.connected(peripheral);
@@ -80,16 +80,17 @@ export class BLService {
 
 	/* Subscribe to the BPM */
 	this.HRsubscription.subscribe(buffer => {
-	    var data = new Uint8Array(buffer);
-
+	    let data = new Uint8Array(buffer);
+	    
+	    /* The bytes are in reverse order, so we bit shift them to form the date */
 	    let date = this.calcDate(data[3],data[2],data[1],data[0]);
 
+	    /* Record the last timestamp for data checking with peripheral */
 	    this.lastDate = date;
-
-	    console.log(data[4]);
 
 	    /* Store data (date * 1000 to account for milliseconds) */
 	    this.storage.store(new Date(date * 1000),data[4]);
+	    
 	    /* Republish the data for the home page */
 	    this.events.publish('bpm',data[4]);
 	    
@@ -99,19 +100,17 @@ export class BLService {
 
 	/* Subscribe to the EKG */
 	this.EKGsubscription.subscribe(buffer => {
-	    var data = new Uint8Array(buffer);
+	    let data = new Uint8Array(buffer);
 	    
 	    /* Republish the data for the home page */
 	    this.events.publish('ekg',data);
 	});
 
 	this.HRBundlesubscription.subscribe(buffer => {
-	    var data = new Uint8Array(buffer);
+	    let data = new Uint8Array(buffer);
 
 	    /* BPMs are located every 5 indices */
 	    let bpmArray = [data[4],data[9],data[14],data[19]];
-
-	    console.log(bpmArray);
 
 	    /* Dates must be calculated in reverse order */
 	    let dateArray = [
@@ -123,22 +122,29 @@ export class BLService {
 
 	    /* Push all data points to storage 
 	       (dates * 1000 for ms format ) */
-	    for (var i=0; i < bpmArray.length; i++) {
+	    for (let i=0; i < bpmArray.length; i++) {
 		this.storage.store(new Date(dateArray[i] * 1000),bpmArray[i]);
 	    }
 	});
 
+	/* Periodically, the peripheral may request a comparison from the last date
+	   received to the current date to check if all data has arrived */
 	this.dateChecksubscription.subscribe(buffer => {
-	    var data = new Uint8Array(buffer);
+	    let data = new Uint8Array(buffer);
+	    
 	    let curDate = this.calcDate(data[3],data[2],data[1],data[0]);
 	    if (!this.lastDate)
 		return;
+	    
 	    let uint8 = new Uint8Array(4);
-	    let tmp = 0;
+
+	    let caughtUp = 0;
 	    if (this.lastDate >= curDate)
-		tmp = 1;
-	    for (var i = 0; i < 4; i++) {
-		uint8[i] = tmp;
+		caughtUp = 1;
+
+	    /* Send back an array of the boolean result */
+	    for (let i = 0; i < 4; i++) {
+		uint8[i] = caughtUp;
 	    }
 
 	    BLE.write(peripheral.id, this.scanInfo.service, this.scanInfo.datecheck, uint8.buffer).then(
@@ -216,7 +222,7 @@ export class BLService {
 	else return BLE.isConnected(null);
     }
 
-    /* Return name of device */
+    /* Return name of current device */
     getName() {
 	if (this.peripheral) {
 	    return this.peripheral.name;

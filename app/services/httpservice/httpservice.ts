@@ -1,7 +1,7 @@
-import {InAppBrowser} from 'ionic-native';
-import {Injectable} from '@angular/core';
-import {Http,Headers} from '@angular/http';
-import {StorageService} from '../../services/storageservice/storageservice';
+import { InAppBrowser } from 'ionic-native';
+import { Injectable } from '@angular/core';
+import { Http, Headers } from '@angular/http';
+import { StorageService } from '../../services/storageservice/storageservice';
 
 @Injectable()
 export class HttpService {
@@ -13,16 +13,14 @@ export class HttpService {
 	this.appendIndex = 0;
     }
 
-    
-
 
     /* Opens a browser, allows user to login, return with access token */
     getToken() {
-	var self = this;
+	let self = this;
 	return new Promise(function(resolve, reject) {
 
 	    /* Open the URL in app without header information (URL, back/forward buttons, etc.) */
-	    var browserRef = InAppBrowser.open("http://143.229.6.40:80/oauth/authorize?response_type=token&client_id=vassarOMH&redirect_uri=http://143.229.6.40:80/&scope=write_data_points%20read_data_points", "_blank","location=no");
+	    let browserRef = InAppBrowser.open("http://143.229.6.40:80/oauth/authorize?response_type=token&client_id=vassarOMH&redirect_uri=http://143.229.6.40:80/&scope=write_data_points%20read_data_points", "_blank","location=no");
 	    
 	    /* When the browser reloads, check the URL */
 	    browserRef.addEventListener("loadstart", (event) => {
@@ -47,7 +45,7 @@ export class HttpService {
     }
     
 
-    /* Make a get request from the server */
+    /* Make a get request from the server with a function to use on the data */
     makeGetRequest(d1,d2,requestFunction) {
 	/* If the token isn't null, we can get immediately */
 	if (this.token) {
@@ -70,7 +68,7 @@ export class HttpService {
     get(d1,d2,requestFunction) {
 
 	/* Create headers (includes token) */
-	var authHeaders = new Headers();
+	let authHeaders = new Headers();
 	authHeaders.append('Authorization', 'Bearer ' + this.token);
 	authHeaders.append('Accept', 'application/json');
 
@@ -88,7 +86,7 @@ a_name=heart-rate&schema_version=1.0&created_on_or_after=" + d1 + "&created_befo
     }
 
 
-    /* Make a post request to the server */
+    /* Make a post request to the server with function to call on success */
     makePostRequest(value,success) {
 	
 	/* If the token isn't null, we can post immediately */
@@ -97,10 +95,7 @@ a_name=heart-rate&schema_version=1.0&created_on_or_after=" + d1 + "&created_befo
 	    return;
 	}
 
-	/* Otherwise, we have to retrieve the token, noting
-	   that the call to post must be in the success function
-	   and not afterward because this call must only occur after the
-	   data is retrieved from storage, which takes a while */
+	/* Otherwise, we have to retrieve the token first */
 	this.storage.retrieveToken().then(
 	    (token) => {
 		this.token = token;
@@ -114,11 +109,9 @@ a_name=heart-rate&schema_version=1.0&created_on_or_after=" + d1 + "&created_befo
     /* Post helper function */
     post(value,success) {
 	/* Create headers (includes token) */
-	var authHeaders = new Headers();
+	let authHeaders = new Headers();
 	authHeaders.append('Authorization', 'Bearer ' + this.token);
 	authHeaders.append('Content-Type', 'application/json');
-
-	alert(JSON.stringify(value));
 
 	/* Post the data */
 	this.http.post("http://143.229.6.40:443/v1.0.M1/dataPoints/multi",
@@ -131,11 +124,11 @@ a_name=heart-rate&schema_version=1.0&created_on_or_after=" + d1 + "&created_befo
 		      );
     }
 
-    /* Change the JSON template with desired information.
-       Correct dates not implemented yet */
+    
+    /* Change the JSON template with desired information */
     createJSON(value,date) {
 	/* The format of a post to the server */
-	var bpm_json = 
+	let bpm_json = 
 	    {
 		"header":{
 		    "id":"0",

@@ -1,11 +1,10 @@
-import {Storage, SqlStorage} from 'ionic-angular';
-import {Injectable} from '@angular/core';
+import { Storage, SqlStorage } from 'ionic-angular';
+import { Injectable } from '@angular/core';
 
 @Injectable()
 export class StorageService {
     
     storage: any; /* Storage unit */
-    bgToggled: boolean;
 
     constructor() {
 	this.storage = new Storage(SqlStorage);
@@ -19,16 +18,16 @@ export class StorageService {
 	);
     }
 
-    /* Store a value into the database with the current time automatically generated */
+    /* Store a value into the database */
     store(date,newVal) {
 	this.storage.query('INSERT INTO dataTable(date,value) VALUES(?,?)',[date,newVal]).then(
-	    function() {}, //{alert("Stored data: " + newVal);},
+	    function() {},
 	    //function() {alert("Failed to store data");}
-	    function() {}
+	    function() {console.log("Failed to store data");}
 	);
     }
     
-    /* Retrieve all data points from the database, loop over them, and display the values */
+    /* Retrieve all data points from the database */
     retrieve() {
 	//return this.storage.query('SELECT * FROM dataTable WHERE date BETWEEN ? AND ?',[date1,date2]);
 	return this.storage.query('SELECT * FROM dataTable');

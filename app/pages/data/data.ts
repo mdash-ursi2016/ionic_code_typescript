@@ -94,7 +94,11 @@ export class DataPage {
     /* Store the current date and a random number 1-100.
        Testing purposes */
     store() {
-	this.storage.store(new Date(),Math.floor(Math.random() * 100) + 1);
+	//this.storage.store(new Date(),Math.floor(Math.random() * 100) + 1);
+	this.storage.retrieve().then(
+	    data => console.log(data.res.rows.length),
+	    fail => console.log("Data retrieve fail")
+	);
     }
 
 
