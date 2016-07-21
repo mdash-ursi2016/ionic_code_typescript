@@ -4,8 +4,8 @@ import { NavController, Events, Platform } from 'ionic-angular';
 import { BLService } from '../../services/blservice/blservice';
 
 declare var content: any; /* tell the transpiler not to complain about DOM elements. Eventually should use ViewChild */
-declare var msg: any;
-declare var instruct: any;
+//declare var msg: any;
+//declare var instruct: any;
 
 @Component({
     templateUrl: 'build/pages/home/home.html'
@@ -19,11 +19,15 @@ export class HomePage {
     c: any;
     ctx: any; /* The canvas context */
     i: number; /* Current x-axis value on the canvas */
-    content: any; /* BPM readout HTML object */
-    msg: any; /* Messages for initial display on app open */
-    instruct: any;
+    content: any; /* BPM readout */
+    msg: string; /* Messages for initial display on app open */
+    instruct: string;
 
     constructor(private nav: NavController, private events: Events, private platform: Platform, private bl: BLService) {
+	
+	this.content = "BPM";
+	this.msg = "To display an EKG measurement, first connect to a device via Bluetooth Settings";
+	this.instruct = "Head to the About page for startup instructions";
 	
 	/* Set dimensions relative to window */
 	this.canvasWidth = window.screen.width - 50;
@@ -31,37 +35,38 @@ export class HomePage {
     }
 
 
-    ionViewDidEnter() {                                                                                    
-            /* Retrieve information about the canvas and its context */
-	    this.c = document.getElementById("myCanvas");
-            this.ctx = this.c.getContext("2d");
-
-            /* The first point is actually offscreen so a big jump doesn't get drawn */
-            this.ctx.moveTo(-2,0);
-            this.ctx.beginPath();
-            this.i = -2;
-
-            /* Set the HTML element for usage if the page is left and re-entered */
-            this.content = content;
-            this.msg = msg;
-            this.instruct = instruct;
-
-            /* If we have a device to connect to, start up the data relay */
-            this.platform.ready().then(() => {
-                this.connect();
-            });
+    ionViewDidEnter() {
+	
+        /* Retrieve information about the canvas and its context */
+	this.c = document.getElementById("myCanvas");
+        this.ctx = this.c.getContext("2d");
+	
+        /* The first point is actually offscreen so a big jump doesn't get drawn */
+        this.ctx.moveTo(-2,0);
+        this.ctx.beginPath();
+        this.i = -2;
+	
+        /* Set the HTML element for usage if the page is left and re-entered */
+	this.content = content;
+        
+        /* If we have a device to connect to, start up the data relay */
+        this.platform.ready().then(() => {
+            this.connect();
+        });
     }
 
     connect() {
+
 	/* Subscribe to incoming data packets
 	   First make sure the subscription exists */
 	if (!this.bl.getSubscription()) return;
 	
 	/* Remove the instructions */
-	this.msg.innerHTML = "";
-	this.instruct.innerHTML = "";
-	
+	this.msg = "";
+	this.instruct = "";
+
 	/* Display the BPM provided by BLService*/
+
 	this.events.subscribe('bpm', (data) => {
 	    this.content.innerHTML = "<center>" + data + "</center>";
 	});

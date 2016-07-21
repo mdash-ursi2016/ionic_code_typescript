@@ -10,10 +10,11 @@ export class BLService {
 
     scanInfo: any; /* All bluetooth service/characteristic/timeout info */
     peripheral: any; /* The found peripheral after scan selection */
-    HRsubscription: any; /* Subscriptions to various characteristics */
-    EKGsubscription: any;
-    HRBundlesubscription: any;
-    dateChecksubscription: any; 
+    HRSubscription: any; /* Subscriptions to various characteristics */
+    EKGSubscription: any;
+    HRBundleSubscription: any;
+    dateCheckSubscription: any;
+    stepSubscription: any;
     lastDate: any; /* The most recent date received on the HRsubscription */
 
 
@@ -23,7 +24,8 @@ export class BLService {
 	    heartrate: 'b0351694-25e6-4eb5-918c-ca9403ddac47', /* Heart rate - [4 byte date, 1 byte bpm] */ 
 	    ekg: '1bf9168b-cae4-4143-a228-dc7850a37d98', /* EKG characteristic - [[14 x 1 byte EKG]] */
 	    heartratebundle: '3cd43730-fc61-4ea7-aa18-6e7c3d798d74', /* BPM bundle characteristic [4x 4 byte date, 1 byte bpm] */
-	    datecheck: '3750215f-b147-4bdf-9271-0b32c1c5c49d' /* Verifying timestamp characteristic [4 byte date] */
+	    datecheck: '3750215f-b147-4bdf-9271-0b32c1c5c49d', /* Verifying timestamp characteristic [4 byte date] */
+	    steps: '81d4ef8b-bb65-4fef-b701-2d7d9061e492' /* Step data - [4 byte date, 2 byte date difference, 2 byte steps] */
 	};
     }
 
@@ -67,19 +69,21 @@ export class BLService {
 	this.sendDate(peripheral);
 
 	/* Subscription for the heart rate (BPM) */
-	this.HRsubscription = BLE.startNotification(peripheral.id, this.scanInfo.service, this.scanInfo.heartrate);
+	this.HRSubscription = BLE.startNotification(peripheral.id, this.scanInfo.service, this.scanInfo.heartrate);
 
 	/* Subscription for the EKG data */
-	this.EKGsubscription = BLE.startNotification(peripheral.id, this.scanInfo.service, this.scanInfo.ekg);
+	this.EKGSubscription = BLE.startNotification(peripheral.id, this.scanInfo.service, this.scanInfo.ekg);
 
 	/* Subscription for the bundle data */
-	this.HRBundlesubscription = BLE.startNotification(peripheral.id, this.scanInfo.service, this.scanInfo.heartratebundle);
+	this.HRBundleSubscription = BLE.startNotification(peripheral.id, this.scanInfo.service, this.scanInfo.heartratebundle);
 
 	/* Subscription for date verification */
-	this.dateChecksubscription = BLE.startNotification(peripheral.id, this.scanInfo.service, this.scanInfo.datecheck);
+	this.dateCheckSubscription = BLE.startNotification(peripheral.id, this.scanInfo.service, this.scanInfo.datecheck);
 
+	this.stepSubscription = BLE.startNotification(peripheral.id, this.scanInfo.service, this.scanInfo.steps);
+	
 	/* Subscribe to the BPM */
-	this.HRsubscription.subscribe(buffer => {
+	this.HRSubscription.subscribe(buffer => {
 	    let data = new Uint8Array(buffer);
 	    
 	    /* The bytes are in reverse order, so we bit shift them to form the date */
@@ -99,14 +103,14 @@ export class BLService {
         });
 
 	/* Subscribe to the EKG */
-	this.EKGsubscription.subscribe(buffer => {
+	this.EKGSubscription.subscribe(buffer => {
 	    let data = new Uint8Array(buffer);
 	    
 	    /* Republish the data for the home page */
 	    this.events.publish('ekg',data);
 	});
 
-	this.HRBundlesubscription.subscribe(buffer => {
+	this.HRBundleSubscription.subscribe(buffer => {
 	    let data = new Uint8Array(buffer);
 
 	    /* BPMs are located every 5 indices */
@@ -129,7 +133,7 @@ export class BLService {
 
 	/* Periodically, the peripheral may request a comparison from the last date
 	   received to the current date to check if all data has arrived */
-	this.dateChecksubscription.subscribe(buffer => {
+	this.dateCheckSubscription.subscribe(buffer => {
 	    let data = new Uint8Array(buffer);
 	    
 	    let curDate = this.calcDate(data[3],data[2],data[1],data[0]);
@@ -152,6 +156,15 @@ export class BLService {
 		fail => {console.log("did not write back");}
 	    );
 	});
+
+	
+	this.stepSubscription.subscribe(buffer => {
+	    let data = new Uint16Array(buffer);
+	    alert(JSON.stringify(data));
+	    let tmp: number = (data[1] << 16) + (data[0]);
+	    console.log("Date: " + tmp);
+	});
+	
     }
 
     /* Format a unix epoch from individual bytes */
@@ -195,7 +208,8 @@ export class BLService {
 	    BLE.isConnected(periphID).then(() => {
 
 		/* Reset subscriptions so if anything requests them they are null */
-		this.HRsubscription = this.EKGsubscription = this.HRBundlesubscription = null;
+		this.HRSubscription = this.EKGSubscription = this.HRBundleSubscription =
+		    this.dateCheckSubscription = this.stepSubscription = null;
 
 		BLE.stopNotification(periphID, this.scanInfo.service, this.scanInfo.heartrate).then();
 		BLE.stopNotification(periphID, this.scanInfo.service, this.scanInfo.ekg).then();
@@ -234,7 +248,7 @@ export class BLService {
        Currently used by home page to know if
        it should subscribe to data */
     getSubscription() {
-	return this.HRsubscription;
+	return this.HRSubscription;
     }
 
 }
