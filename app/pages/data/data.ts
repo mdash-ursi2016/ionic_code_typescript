@@ -96,8 +96,8 @@ export class DataPage {
     store() {
 	//this.storage.store(new Date(),Math.floor(Math.random() * 100) + 1);
 	this.storage.retrieve().then(
-	    data => console.log(data.res.rows.length),
-	    fail => console.log("Data retrieve fail")
+	    data => alert(data.res.rows.length),
+	    fail => alert("Data retrieve fail")
 	);
     }
 

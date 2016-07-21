@@ -8,6 +8,7 @@ export class StorageService {
 
     constructor() {
 	this.storage = new Storage(SqlStorage);
+	this.makeTable(); /* Enforce that a data table must exist */
     }
 
     /* Create a new table, as long as one doesn't already exist, with datetime and integer columns */

@@ -66,7 +66,7 @@ class MyApp {
             //document.addEventListener("resume",this.resumeOperations.bind(this));    
 	    
             /* Function that regulates periodic server posting */
-            //this.pushTimer();          
+            this.pushTimer();          
 	    
 
 	    StatusBar.styleDefault();
