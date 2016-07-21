@@ -93,7 +93,7 @@ export class BLService {
 	    this.lastDate = date;
 
 	    /* Store data (date * 1000 to account for milliseconds) */
-	    this.storage.store(new Date(date * 1000),data[4]);
+	    this.storage.storeBPM(new Date(date * 1000),data[4]);
 	    
 	    /* Republish the data for the home page */
 	    this.events.publish('bpm',data[4]);
@@ -127,7 +127,7 @@ export class BLService {
 	    /* Push all data points to storage 
 	       (dates * 1000 for ms format ) */
 	    for (let i=0; i < bpmArray.length; i++) {
-		this.storage.store(new Date(dateArray[i] * 1000),bpmArray[i]);
+		this.storage.storeBPM(new Date(dateArray[i] * 1000),bpmArray[i]);
 	    }
 	});
 

@@ -11,34 +11,56 @@ export class StorageService {
 	this.makeTable(); /* Enforce that a data table must exist */
     }
 
-    /* Create a new table, as long as one doesn't already exist, with datetime and integer columns */
+    /* Create new tables, as long as they don't already exist, with datetime and integer columns */
     makeTable() {
-	this.storage.query('CREATE TABLE IF NOT EXISTS dataTable(date DATETIME, value INTEGER)').then(
+	this.storage.query('CREATE TABLE IF NOT EXISTS bpmTable(bpmdate DATETIME, bpm INTEGER)').then(
 	    function() {},
-	    function() {alert("Failed to create table");}
+	    function() {alert("Failed to create bpm table");}
+	);
+
+	this.storage.query('CREATE TABLE IF NOT EXISTS stepTable(stepdate DATETIME, step INTEGER)').then(
+	    function() {},
+	    function() {alert("Failed to create step table");}
+	);
+    }
+	
+
+    /* Store a new bpm value into the database */
+    storeBPM(date,newVal) {
+	this.storage.query('INSERT INTO bpmTable(bpmdate,bpm) VALUES(?,?)',[date,newVal]).then(
+	    function() {},
+	    //function() {alert("Failed to store data");}
+	    function() {console.log("Failed to store bpm data");}
 	);
     }
 
-    /* Store a value into the database */
-    store(date,newVal) {
-	this.storage.query('INSERT INTO dataTable(date,value) VALUES(?,?)',[date,newVal]).then(
+    /* Store a new step value into the database */
+    storeStep(date,newVal) {
+	this.storage.query('INSERT INTO stepTable(stepdate,step) VALUES(?,?)',[date,newVal]).then(
 	    function() {},
-	    //function() {alert("Failed to store data");}
-	    function() {console.log("Failed to store data");}
+	    function() {console.log("Failed to store step data");}
 	);
     }
     
-    /* Retrieve all data points from the database */
-    retrieve() {
+    
+    /* Retrieve all bpm data points */
+    retrieveBPM() {
 	//return this.storage.query('SELECT * FROM dataTable WHERE date BETWEEN ? AND ?',[date1,date2]);
-	return this.storage.query('SELECT * FROM dataTable');
+	return this.storage.query('SELECT * FROM bpmTable');
     }
+
+    /* Retrieve all step data points */
+    retrieveStep() {
+	return this.storage.query('SELECT * FROM stepTable');
+    }
+
+    
 
     /* Delete the table */
     clear() {
-	this.storage.query('DROP TABLE dataTable').then(
+	this.storage.query('DROP TABLE IF EXISTS bpmTable; DROP TABLE IS EXISTS stepTable').then(
 	    function() {},
-	    function() {alert("Failed to delete table");}
+	    function() {alert("Failed to delete tables");}
 	);
     }
 

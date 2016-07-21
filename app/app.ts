@@ -152,14 +152,14 @@ class MyApp {
 	    this.jsons = [];
 	    
 	    /* Grab all the data from storage */
-	    this.storage.retrieve().then(
+	    this.storage.retrieveBPM().then(
 		data => {
 		    /* If successful, cycle through and create an array of JSONs
 		       in the correct format for the server to read */
 		    for (let i = 0; i < data.res.rows.length; i++) {
 			this.jsons.push(this.httpservice.createJSON(
-			    data.res.rows.item(i).value,
-			    new Date(data.res.rows.item(i).date)));
+			    data.res.rows.item(i).bpm,
+			    new Date(data.res.rows.item(i).bpmdate)));
 		    }
 		    /* If there's any data, we want to post it */
 		    if (this.jsons.length > 0) {
@@ -169,7 +169,7 @@ class MyApp {
 			    self.storage.clear();
 			    self.storage.makeTable();
 			    let toast = Toast.create({
-				message: "Data posted to server",
+				message: "Data posted to server (" + self.jsons.length + " data points)",
 				duration: 2000,
 				position: 'bottom',
 				showCloseButton: true
@@ -183,7 +183,7 @@ class MyApp {
 	    );
 	    /* Repeat this function again in 5 minutes */
 	    this.pushTimer();
-	}, 300000);
+	}, 30000);
     }
 
 

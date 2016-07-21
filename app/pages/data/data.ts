@@ -95,7 +95,7 @@ export class DataPage {
        Testing purposes */
     store() {
 	//this.storage.store(new Date(),Math.floor(Math.random() * 100) + 1);
-	this.storage.retrieve().then(
+	this.storage.retrieveBPM().then(
 	    data => alert(data.res.rows.length),
 	    fail => alert("Data retrieve fail")
 	);
