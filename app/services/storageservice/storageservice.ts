@@ -30,7 +30,7 @@ export class StorageService {
 	this.storage.query('INSERT INTO bpmTable(bpmdate,bpm) VALUES(?,?)',[date,newVal]).then(
 	    function() {},
 	    //function() {alert("Failed to store data");}
-	    function() {console.log("Failed to store bpm data");}
+	    function(err) {console.log("Failed to store bpm data: " + JSON.stringify(err));}
 	);
     }
 
@@ -38,7 +38,7 @@ export class StorageService {
     storeStep(startdate,enddate,newVal) {
 	this.storage.query('INSERT INTO stepTable(stepstartdate,stependdate,step) VALUES(?,?,?)',[startdate,enddate,newVal]).then(
 	    function() {},
-	    function() {console.log("Failed to store step data");}
+	    function(err) {console.log("Failed to store step data: " + JSON.stringify(err));}
 	);
     }
     
@@ -56,11 +56,15 @@ export class StorageService {
 
     
 
-    /* Delete the table */
+    /* Delete the tables */
     clear() {
-	this.storage.query('DROP TABLE IF EXISTS bpmTable; DROP TABLE IS EXISTS stepTable').then(
+	this.storage.query('DROP TABLE IF EXISTS bpmTable').then(
 	    function() {},
-	    function() {alert("Failed to delete tables");}
+	    function() {alert("Failed to delete bpm table");}
+	);
+	this.storage.query('DROP TABLE IF EXISTS stepTable').then(
+	    function() {},
+	    function() {alert("Failed to delete step table");}
 	);
     }
 

@@ -153,37 +153,55 @@ class MyApp {
 	    
 	    /* Grab all the data from storage */
 	    this.storage.retrieveBPM().then(
-		data => {
-		    /* If successful, cycle through and create an array of JSONs
-		       in the correct format for the server to read */
-		    for (let i = 0; i < data.res.rows.length; i++) {
-			this.jsons.push(this.httpservice.createJSON(
-			    data.res.rows.item(i).bpm,
-			    new Date(data.res.rows.item(i).bpmdate)));
-		    }
-		    /* If there's any data, we want to post it */
-		    if (this.jsons.length > 0) {
-			let self = this;
-			this.httpservice.makePostRequest(this.jsons, function() {
-			    /* Success callback if the data was posted. Clear out the storage */
-			    self.storage.clear();
-			    self.storage.makeTable();
-			    let toast = Toast.create({
-				message: "Data posted to server (" + self.jsons.length + " data points)",
-				duration: 2000,
-				position: 'bottom',
-				showCloseButton: true
-			    });
-			    self.nav.present(toast);
-			});
-		    }
+		bpmData => {
+
+		    this.storage.retrieveStep().then(
+			stepData => {
+
+			    /* Format the step data in appropriate JSON and add to common list */
+			    for (let i = 0; i < stepData.res.rows.length; i++) {
+				this.jsons.push(this.httpservice.createStepJSON(
+				    stepData.res.rows.item(i).step,
+				    new Date(stepData.res.rows.item(i).stepstartdate),
+				    new Date(stepData.res.rows.item(i).stependdate)));
+			    }
+
+			    /* Format the bpm data in appropriate JSON and add to common list */
+			    for (let i = 0; i < bpmData.res.rows.length; i++) {
+				this.jsons.push(this.httpservice.createBPMJSON(
+				    bpmData.res.rows.item(i).bpm,
+				    new Date(bpmData.res.rows.item(i).bpmdate)));
+			    }
+
+
+			    /* If there's any data, we want to post it */
+			    if (this.jsons.length > 0) {
+				let self = this;
+				this.httpservice.makePostRequest(this.jsons, function() {
+				    /* Success callback if the data was posted. Clear out the storage */
+				    self.storage.clear();
+				    self.storage.makeTable();
+				    let toast = Toast.create({
+					message: "Data posted to server (" + self.jsons.length + " data points)",
+					duration: 2000,
+					position: 'bottom',
+					showCloseButton: true
+				    });
+				    self.nav.present(toast);
+				});
+			    }
+
+			}, err => { alert("Step Retrieval Error"); }
+		    );
+		    
+
 		}, err => {
-		    console.log("Error");
+		    alert("BPM Retrieval Error");
 		}
 	    );
 	    /* Repeat this function again in 5 minutes */
 	    this.pushTimer();
-	}, 30000);
+	}, 45000);
     }
 
 

@@ -163,7 +163,9 @@ export class BLService {
 	    let data = new Uint16Array(buffer);
 	    let startdate: number = (data[1] << 16) + (data[0]);
 	    let enddate: number = startdate + data[2];
-	    this.storage.storeStep(startdate,enddate,data[3]);
+	    this.storage.storeStep(new Date(startdate * 1000),
+				   new Date(enddate * 1000),
+				   data[3]);
 	});
 
 	/* Live step subscription is just a current step, forward it */

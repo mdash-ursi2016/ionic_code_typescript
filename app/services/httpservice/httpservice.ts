@@ -126,7 +126,7 @@ a_name=heart-rate&schema_version=1.0&created_on_or_after=" + d1 + "&created_befo
 
     
     /* Change the JSON template with desired information */
-    createJSON(value,date) {
+    createBPMJSON(value,date) {
 	/* The format of a post to the server */
 	let bpm_json = 
 	    {
@@ -166,5 +166,53 @@ a_name=heart-rate&schema_version=1.0&created_on_or_after=" + d1 + "&created_befo
 	
 	return bpm_json;
     }
+
+    createStepJSON(value,startdate,enddate) {
+	/* The format of a post to the server */
+	let bpm_json = 
+	    {
+		"header":{
+		    "id":"0",
+		    "creation_date_time":"SOME_TIMESTAMP",
+		    "acquisition_provenance":{
+			"source_name":"arduino",
+			"modality":"sensed"
+		    },
+		    "schema_id":{
+			"namespace":"omh",
+			"name":"step-count",
+			"version":"1.0"
+		    }
+		},
+		"body":{
+		    "step_count":0,
+		    "effective_time_frame":{
+			"time_interval":{
+			    "start_date_time":"SOME_TIMESTAMP",
+			    "end_date_time":"SOME_TIMESTAMP"
+			}
+		    }
+		}
+	    };
+
+	bpm_json.header.creation_date_time = enddate.toISOString();
+	
+	/* Oftentimes when posting multiple numbers will be assigned IDs within the same
+	   millisecond. Add a counter to the end to combat this. */
+	bpm_json.header.id = new Date().getTime().toString() + "-" + this.appendIndex.toString();
+	bpm_json.body.step_count = value;
+	bpm_json.body.effective_time_frame.time_interval.start_date_time = startdate.toISOString();
+	bpm_json.body.effective_time_frame.time_interval.end_date_time = enddate.toISOString();
+	
+	this.appendIndex++;
+	
+	return bpm_json;
+
+
+
+
+    }
+
+    
 
 }
