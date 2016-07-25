@@ -74,6 +74,7 @@ class MyApp {
   }
 
     pauseOperations() {
+	
 	/* Ensure that background mode is actually on. 
 	   Especially important after initial call */
 	if (!cordova.plugins.backgroundMode.isActive())

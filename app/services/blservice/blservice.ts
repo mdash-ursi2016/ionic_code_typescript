@@ -17,7 +17,9 @@ export class BLService {
     stepSubscription: any;
     liveStepSubscription: any;
     lastDate: any; /* The most recent date received on the HRsubscription */
-
+    totalSteps: number; /* The total number of steps taken so far */
+    lastStepCount: number; /* The last number of steps reported */
+    
 
     constructor(private storage: StorageService, private events: Events, private httpservice: HttpService) {
 	this.scanInfo = { 
@@ -29,6 +31,9 @@ export class BLService {
 	    steps: '81d4ef8b-bb65-4fef-b701-2d7d9061e492', /* Step data - [4 byte date, 2 byte date difference, 2 byte steps] */
 	    livesteps: 'f579caa3-9390-46ae-ac67-1445b6f5b9fd'
 	};
+
+	this.totalSteps = 0;
+	this.lastStepCount = 0;
     }
 
     /* Return a Promise for if Bluetooth is enabled or not */
@@ -161,6 +166,9 @@ export class BLService {
 	/* Step subscription contains a date, a time offset, and a number of steps */
 	this.stepSubscription.subscribe(buffer => {
 	    let data = new Uint16Array(buffer);
+
+	    this.lastStepCount = 0;
+	    
 	    let startdate: number = (data[1] << 16) + (data[0]);
 	    let enddate: number = startdate + data[2];
 	    this.storage.storeStep(new Date(startdate * 1000),
@@ -172,6 +180,14 @@ export class BLService {
 	this.liveStepSubscription.subscribe(buffer => {
 	    let data = new Uint16Array(buffer);
 	    this.events.publish('steps',data[0]);
+
+	    /* For total steps, calculate how many steps to add as the current
+	       step count minues the previous */
+	    this.totalSteps += (data[0] - this.lastStepCount);
+	    this.lastStepCount = data[0];
+	    this.events.publish('totalsteps',this.totalSteps);
+
+	    
 	});
 	
     }
@@ -258,6 +274,11 @@ export class BLService {
        it should subscribe to data */
     getSubscription() {
 	return this.HRSubscription;
+    }
+
+    /* Reset the total step count */
+    resetSteps() {
+	this.totalSteps = 0;
     }
 
 }

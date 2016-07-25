@@ -21,9 +21,9 @@
   <br>
 
   <!-- BPM readout -->
-  <div id="content" style="color:#4BC0C0;font-size:300%;"><center>BPM</center></div>
-  <div id="steps" style="color:#B34F3F;font-size:300%;"><center>Steps</center></div>
-
+  <div id="content" style="color:#4BC0C0;font-size:250%;"><center>BPM</center></div>
+  <div id="steps" style="color:#B34F3F;font-size:250%;"><center>Steps</center></div>
+  <div id="totalSteps" style="font-size:250%;"><center>Total Steps</center></div>
   
   <!-- EKG canvas -->
   <canvas id="myCanvas" width={{canvasWidth}} height={{canvasHeight}} style="background-color:black; border:1px solid #000000;">
@@ -34,5 +34,6 @@
 
   <!-- More instructions to disappear -->
   <p><center>{{msg}}</center></p>
+  <button clear (click)="resetSteps()">Reset Step Count</button>
 
 </ion-content>

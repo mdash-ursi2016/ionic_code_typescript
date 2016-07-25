@@ -5,6 +5,7 @@ import { BLService } from '../../services/blservice/blservice';
 
 declare var steps: any;
 declare var content: any; /* tell the transpiler not to complain about DOM elements. Eventually should use ViewChild */
+declare var totalSteps: any;
 
 @Component({
     templateUrl: 'build/pages/home/home.html'
@@ -20,6 +21,7 @@ export class HomePage {
     i: number; /* Current x-axis value on the canvas */
     content: any; /* BPM readout */
     steps: any;
+    totalSteps: any;
     msg: string; /* Messages for initial display on app open */
     instruct: string;
 
@@ -48,7 +50,7 @@ export class HomePage {
         /* Set the HTML element for usage if the page is left and re-entered */
 	this.content = content;
 	this.steps = steps;
-
+	this.totalSteps = totalSteps;
 	
         /* If we have a device to connect to, start up the data relay */
         this.platform.ready().then(() => {
@@ -68,12 +70,17 @@ export class HomePage {
 
 	/* Display the BPM provided by BLService*/
 	this.events.subscribe('bpm', (data) => {
-	    this.content.innerHTML = "<center>" + data + "</center>";
+	    this.content.innerHTML = "<center>BPM: " + data + "</center>";
 	});
 
 	/* Display the steps provided by BLService */
 	this.events.subscribe('steps', (data) => {
-	    this.steps.innerHTML = "<center>" + data + "</center>";
+	    this.steps.innerHTML = "<center>Steps: " + data + "</center>";
+	});
+
+	/* Display the total step count provided by BLService */
+	this.events.subscribe('totalsteps', (data) => {
+	    this.totalSteps.innerHTML = "<center>Total Steps: " + data + "</center>";
 	});
 	
 
@@ -106,6 +113,11 @@ export class HomePage {
 		this.ctx.moveTo(-2, this.c.height - point);
 		this.i = -2;
 	    }
+    }
+
+    /* Reset the total step count */
+    resetSteps() {
+	this.bl.resetSteps();
     }
 
 }
