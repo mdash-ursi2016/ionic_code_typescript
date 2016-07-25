@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { NavController, Events, Platform } from 'ionic-angular';
+import { NavController, Events, Platform, Alert } from 'ionic-angular';
 
 import { BLService } from '../../services/blservice/blservice';
 
@@ -22,16 +22,11 @@ export class HomePage {
     content: any; /* BPM readout */
     steps: any;
     totalSteps: any;
-    msg: string; /* Messages for initial display on app open */
-    instruct: string;
 
     constructor(private nav: NavController, private events: Events, private platform: Platform, private bl: BLService) {
 	
-	this.msg = "To display an EKG measurement, first connect to a device via Bluetooth Settings";
-	this.instruct = "Head to the About page for startup instructions";
-	
 	/* Set dimensions relative to window */
-	this.canvasWidth = window.screen.width - 50;
+	this.canvasWidth = window.screen.width;
 	this.canvasHeight = window.screen.height / 3;
     }
 
@@ -63,24 +58,20 @@ export class HomePage {
 	/* Subscribe to incoming data packets
 	   First make sure the subscription exists */
 	if (!this.bl.getSubscription()) return;
-	
-	/* Remove the instructions */
-	this.msg = "";
-	this.instruct = "";
 
 	/* Display the BPM provided by BLService*/
 	this.events.subscribe('bpm', (data) => {
-	    this.content.innerHTML = "<center>BPM: " + data + "</center>";
+	    this.content.innerHTML = data;
 	});
 
 	/* Display the steps provided by BLService */
 	this.events.subscribe('steps', (data) => {
-	    this.steps.innerHTML = "<center>Steps: " + data + "</center>";
+	    this.steps.innerHTML = data;
 	});
 
 	/* Display the total step count provided by BLService */
 	this.events.subscribe('totalsteps', (data) => {
-	    this.totalSteps.innerHTML = "<center>Total Steps: " + data + "</center>";
+	    this.totalSteps.innerHTML = data;
 	});
 	
 
@@ -118,6 +109,16 @@ export class HomePage {
     /* Reset the total step count */
     resetSteps() {
 	this.bl.resetSteps();
+    }
+
+    /* Display the help message */
+    help() {
+	let alert = Alert.create({
+	    title: 'Need Help?',
+	    message: 'Head to the About page for startup instructions.<br><br>To display an EKG measurement or see incoming data, first connect to a device via Bluetooth Settings.<br><br> On this page, you can tap "Total Steps" to reset them.',
+	    buttons: ['Ok']
+	});
+	this.nav.present(alert);
     }
 
 }

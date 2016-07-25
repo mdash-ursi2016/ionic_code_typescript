@@ -6,34 +6,50 @@
     <ion-title>
       Home
     </ion-title>
+    <ion-buttons end style="color:white;position:relative;padding: 0 3vw;">
+      <button (click)="help()">
+	<ion-icon name="help"></ion-icon>
+      </button>
+    </ion-buttons>
   </ion-navbar>
 </ion-header>
 
 
 <ion-content padding class="home">
 
-  
-  <h3><center>Welcome to the URSI App</center></h3>
-  
-  <!-- Instructions -- disappear after connected to a device -->
-  <h6><center>{{instruct}}</center></h6>
+
+  <ion-card>
+    <ion-card-header>
+      Live Health Information
+    </ion-card-header>
+    <ion-list>
+      <!-- BPM readout -->
+      <ion-item>
+	<ion-icon name="heart" style="color:red" item-left></ion-icon>
+	<p id="content" class="list-entry" item-right></p>
+	<p id="content" class="list-title" favorite>BPM</p>
+      </ion-item>
+      <ion-item>
+	<ion-icon name="walk" style="color:blue" item-left></ion-icon>
+	<p id="steps" class="list-entry" item-right></p>
+	<p class="list-title">Steps</p>
+      </ion-item>
+      <ion-item>
+	<ion-icon name="trending-up" style="color:green" item-left></ion-icon>
+	<p id="totalSteps" class="list-entry" item-right></p>
+	<p class="list-title" (click)="resetSteps()">Total Steps</p>
+      </ion-item>
+    </ion-list>
+  </ion-card>
+ 
   
   <br>
 
-  <!-- BPM readout -->
-  <div id="content" style="color:#4BC0C0;font-size:250%;"><center>BPM</center></div>
-  <div id="steps" style="color:#B34F3F;font-size:250%;"><center>Steps</center></div>
-  <div id="totalSteps" style="font-size:250%;"><center>Total Steps</center></div>
   
   <!-- EKG canvas -->
-  <canvas id="myCanvas" width={{canvasWidth}} height={{canvasHeight}} style="background-color:black; border:1px solid #000000;">
+  <b>EKG Display</b>
+  <canvas id="myCanvas" width={{canvasWidth}} height={{canvasHeight}}>
   </canvas>
 
-  <br>
-  <br>
-
-  <!-- More instructions to disappear -->
-  <p><center>{{msg}}</center></p>
-  <button clear (click)="resetSteps()">Reset Step Count</button>
 
 </ion-content>

@@ -10,10 +10,32 @@
     color: #cc0000;
   }
 
-  #content, #steps {
-    float: left;
-    width: 49%;
+  .item {
+    height: 10vh;
   }
 
+  .list-title {
+    font-size:150%;
+  }
+
+  .list-entry {
+    font-size:150%;
+    border-style:solid;
+    border-color:#cccccc;
+    font-weight:bold;
+    border-radius:5px;
+    letter-spacing:3px;
+  }
+
+  canvas {
+    background-color:black;
+    width:115%;
+    position:relative;
+    left:-5vw;
+    border-top-style:solid;
+    border-bottom-style:solid;
+    border-color:#d3d3d3;
+    border-width:5px;
+  }
 
 }
