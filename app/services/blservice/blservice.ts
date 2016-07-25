@@ -160,9 +160,9 @@ export class BLService {
 	
 	this.stepSubscription.subscribe(buffer => {
 	    let data = new Uint16Array(buffer);
-	    alert(JSON.stringify(data));
-	    let tmp: number = (data[1] << 16) + (data[0]);
-	    console.log("Date: " + tmp);
+	    let startdate: number = (data[1] << 16) + (data[0]);
+	    let enddate: number = startdate + data[2];
+	    this.storage.storeStep(startdate,enddate,data[3]);
 	});
 	
     }

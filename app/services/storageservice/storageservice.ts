@@ -18,7 +18,7 @@ export class StorageService {
 	    function() {alert("Failed to create bpm table");}
 	);
 
-	this.storage.query('CREATE TABLE IF NOT EXISTS stepTable(stepdate DATETIME, step INTEGER)').then(
+	this.storage.query('CREATE TABLE IF NOT EXISTS stepTable(stepstartdate DATETIME, stependdate DATETIME, step INTEGER)').then(
 	    function() {},
 	    function() {alert("Failed to create step table");}
 	);
@@ -35,8 +35,8 @@ export class StorageService {
     }
 
     /* Store a new step value into the database */
-    storeStep(date,newVal) {
-	this.storage.query('INSERT INTO stepTable(stepdate,step) VALUES(?,?)',[date,newVal]).then(
+    storeStep(startdate,enddate,newVal) {
+	this.storage.query('INSERT INTO stepTable(stepstartdate,stependdate,step) VALUES(?,?,?)',[startdate,enddate,newVal]).then(
 	    function() {},
 	    function() {console.log("Failed to store step data");}
 	);
