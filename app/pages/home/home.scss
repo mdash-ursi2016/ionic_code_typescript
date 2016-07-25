@@ -7,7 +7,13 @@
   }
 
   h6 {
-     color: #cc0000;
-  }  	    
+    color: #cc0000;
+  }
+
+  #content, #steps {
+    float: left;
+    width: 49%;
+  }
+
 
 }

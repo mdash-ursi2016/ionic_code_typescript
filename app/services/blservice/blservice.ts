@@ -15,6 +15,7 @@ export class BLService {
     HRBundleSubscription: any;
     dateCheckSubscription: any;
     stepSubscription: any;
+    liveStepSubscription: any;
     lastDate: any; /* The most recent date received on the HRsubscription */
 
 
@@ -25,7 +26,8 @@ export class BLService {
 	    ekg: '1bf9168b-cae4-4143-a228-dc7850a37d98', /* EKG characteristic - [[14 x 1 byte EKG]] */
 	    heartratebundle: '3cd43730-fc61-4ea7-aa18-6e7c3d798d74', /* BPM bundle characteristic [4x 4 byte date, 1 byte bpm] */
 	    datecheck: '3750215f-b147-4bdf-9271-0b32c1c5c49d', /* Verifying timestamp characteristic [4 byte date] */
-	    steps: '81d4ef8b-bb65-4fef-b701-2d7d9061e492' /* Step data - [4 byte date, 2 byte date difference, 2 byte steps] */
+	    steps: '81d4ef8b-bb65-4fef-b701-2d7d9061e492', /* Step data - [4 byte date, 2 byte date difference, 2 byte steps] */
+	    livesteps: 'f579caa3-9390-46ae-ac67-1445b6f5b9fd'
 	};
     }
 
@@ -67,20 +69,19 @@ export class BLService {
 
 	/* Inform the peripheral of the current date */
 	this.sendDate(peripheral);
-
 	/* Subscription for the heart rate (BPM) */
 	this.HRSubscription = BLE.startNotification(peripheral.id, this.scanInfo.service, this.scanInfo.heartrate);
-
 	/* Subscription for the EKG data */
 	this.EKGSubscription = BLE.startNotification(peripheral.id, this.scanInfo.service, this.scanInfo.ekg);
-
 	/* Subscription for the bundle data */
 	this.HRBundleSubscription = BLE.startNotification(peripheral.id, this.scanInfo.service, this.scanInfo.heartratebundle);
-
 	/* Subscription for date verification */
 	this.dateCheckSubscription = BLE.startNotification(peripheral.id, this.scanInfo.service, this.scanInfo.datecheck);
-
+	/* Subscription for step count packages */
 	this.stepSubscription = BLE.startNotification(peripheral.id, this.scanInfo.service, this.scanInfo.steps);
+	/* Subscription for live step count */
+	this.liveStepSubscription = BLE.startNotification(peripheral.id, this.scanInfo.service, this.scanInfo.livesteps);
+
 	
 	/* Subscribe to the BPM */
 	this.HRSubscription.subscribe(buffer => {
@@ -157,12 +158,18 @@ export class BLService {
 	    );
 	});
 
-	
+	/* Step subscription contains a date, a time offset, and a number of steps */
 	this.stepSubscription.subscribe(buffer => {
 	    let data = new Uint16Array(buffer);
 	    let startdate: number = (data[1] << 16) + (data[0]);
 	    let enddate: number = startdate + data[2];
 	    this.storage.storeStep(startdate,enddate,data[3]);
+	});
+
+	/* Live step subscription is just a current step, forward it */
+	this.liveStepSubscription.subscribe(buffer => {
+	    let data = new Uint16Array(buffer);
+	    this.events.publish('steps',data[0]);
 	});
 	
     }

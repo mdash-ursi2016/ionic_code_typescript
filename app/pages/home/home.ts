@@ -3,9 +3,8 @@ import { NavController, Events, Platform } from 'ionic-angular';
 
 import { BLService } from '../../services/blservice/blservice';
 
+declare var steps: any;
 declare var content: any; /* tell the transpiler not to complain about DOM elements. Eventually should use ViewChild */
-//declare var msg: any;
-//declare var instruct: any;
 
 @Component({
     templateUrl: 'build/pages/home/home.html'
@@ -20,12 +19,12 @@ export class HomePage {
     ctx: any; /* The canvas context */
     i: number; /* Current x-axis value on the canvas */
     content: any; /* BPM readout */
+    steps: any;
     msg: string; /* Messages for initial display on app open */
     instruct: string;
 
     constructor(private nav: NavController, private events: Events, private platform: Platform, private bl: BLService) {
 	
-	this.content = "BPM";
 	this.msg = "To display an EKG measurement, first connect to a device via Bluetooth Settings";
 	this.instruct = "Head to the About page for startup instructions";
 	
@@ -48,7 +47,9 @@ export class HomePage {
 	
         /* Set the HTML element for usage if the page is left and re-entered */
 	this.content = content;
-        
+	this.steps = steps;
+
+	
         /* If we have a device to connect to, start up the data relay */
         this.platform.ready().then(() => {
             this.connect();
@@ -66,9 +67,13 @@ export class HomePage {
 	this.instruct = "";
 
 	/* Display the BPM provided by BLService*/
-
 	this.events.subscribe('bpm', (data) => {
 	    this.content.innerHTML = "<center>" + data + "</center>";
+	});
+
+	/* Display the steps provided by BLService */
+	this.events.subscribe('steps', (data) => {
+	    this.steps.innerHTML = "<center>" + data + "</center>";
 	});
 	
 
