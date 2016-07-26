@@ -62,7 +62,7 @@ class MyApp {
             //this.resumeOperations();
 
             /* Add listeners for app pause/resume and bind "this" to them */
-            //document.addEventListener("pause",this.pauseOperations.bind(this));    
+            document.addEventListener("pause",this.pauseOperations.bind(this));    
             //document.addEventListener("resume",this.resumeOperations.bind(this));    
 	    
             /* Function that regulates periodic server posting */
@@ -74,11 +74,15 @@ class MyApp {
   }
 
     pauseOperations() {
-	
+
+	/* We need to save the permanent step count */
+	this.blservice.saveStepCount();
+
 	/* Ensure that background mode is actually on. 
 	   Especially important after initial call */
 	if (!cordova.plugins.backgroundMode.isActive())
 	    return;
+	console.log("paused...");
 
 	/* On app leave, disconnect immediately */
 	this.blservice.disconnect();
@@ -202,7 +206,7 @@ class MyApp {
 	    );
 	    /* Repeat this function again in 5 minutes */
 	    this.pushTimer();
-	}, 45000);
+	}, 120000);
     }
 
 

@@ -46,6 +46,7 @@ export class HomePage {
 	this.content = content;
 	this.steps = steps;
 	this.totalSteps = totalSteps;
+	this.totalSteps.innerHTML = this.bl.getStepCount();
 	
         /* If we have a device to connect to, start up the data relay */
         this.platform.ready().then(() => {
@@ -109,13 +110,14 @@ export class HomePage {
     /* Reset the total step count */
     resetSteps() {
 	this.bl.resetSteps();
+	this.totalSteps.innerHTML = this.bl.getStepCount();
     }
 
     /* Display the help message */
     help() {
 	let alert = Alert.create({
 	    title: 'Need Help?',
-	    message: 'Head to the About page for startup instructions.<br><br>To display an EKG measurement or see incoming data, first connect to a device via Bluetooth Settings.<br><br> On this page, you can tap "Total Steps" to reset them.',
+	    message: 'Head to the About page for startup instructions.<br><br>To display an EKG measurement or see incoming data, first connect to a device via Bluetooth Settings.<br><br> On this page, you can swipe "Total Steps" to reset them.',
 	    buttons: ['Ok']
 	});
 	this.nav.present(alert);

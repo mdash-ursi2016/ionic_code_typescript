@@ -23,12 +23,6 @@
       Live Health Information
     </ion-card-header>
     <ion-list>
-      <!-- BPM readout -->
-      <ion-item>
-	<ion-icon name="heart" style="color:red" item-left></ion-icon>
-	<p id="content" class="list-entry" item-right></p>
-	<p id="content" class="list-title" favorite>BPM</p>
-      </ion-item>
       <ion-item>
 	<ion-icon name="walk" style="color:blue" item-left></ion-icon>
 	<p id="steps" class="list-entry" item-right></p>
@@ -37,7 +31,12 @@
       <ion-item>
 	<ion-icon name="trending-up" style="color:green" item-left></ion-icon>
 	<p id="totalSteps" class="list-entry" item-right></p>
-	<p class="list-title" (click)="resetSteps()">Total Steps</p>
+	<p class="list-title" (swipe)="resetSteps()">Total Steps</p>
+      </ion-item>
+      <ion-item>
+	<ion-icon name="heart" style="color:red" item-left></ion-icon>
+	<p id="content" class="list-entry" item-right></p>
+	<p class="list-title" favorite>BPM</p>
       </ion-item>
     </ion-list>
   </ion-card>

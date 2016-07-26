@@ -88,5 +88,15 @@ export class StorageService {
 	return this.storage.get('peripheral');
     }
 
+    /* Save the last total step count */
+    storeLastStepCount(steps) {
+	this.storage.set('laststepcount',steps);
+    }
+
+    /* Retrieve the last total step count */
+    retrieveLastStepCount() {
+	return this.storage.get('laststepcount');
+    }
+
 
 }

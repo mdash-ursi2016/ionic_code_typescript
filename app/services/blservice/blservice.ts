@@ -34,6 +34,8 @@ export class BLService {
 
 	this.totalSteps = 0;
 	this.lastStepCount = 0;
+
+	this.retrieveStepCount();
     }
 
     /* Return a Promise for if Bluetooth is enabled or not */
@@ -279,6 +281,25 @@ export class BLService {
     /* Reset the total step count */
     resetSteps() {
 	this.totalSteps = 0;
+	this.saveStepCount();
+    }
+
+    /* Save current step count */
+    saveStepCount() {
+	this.storage.storeLastStepCount(this.totalSteps);
+    }
+
+    /* Retrieve the step count from storage and set it as needed */
+    retrieveStepCount() {
+	this.storage.retrieveLastStepCount().then(steps => {
+	    this.totalSteps = steps ? parseInt(steps) : 0;
+	}, err => console.log("Could not retrieve step count"));
+    }
+
+    /* Retrieve step count */
+    getStepCount() {
+	this.retrieveStepCount();
+	return this.totalSteps;
     }
 
 }
