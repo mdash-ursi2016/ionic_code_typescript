@@ -22,6 +22,7 @@ export class DataPage {
     labels: Array <any>; /* Labels (timestamps) of data points -- x-axis */
     db: Array  <number>; /* values (bpms) of data points -- y-axis */
 
+    segment: string = "bpmgraph";
     
 
     constructor(private nav: NavController, private storage: StorageService, private httpservice: HttpService) {
@@ -162,7 +163,7 @@ export class DataPage {
 
     /* Chart.js graph routine */
     makeChart() {
-	let canvas: any = document.getElementById("chart");
+	let canvas: any = document.getElementById("bpmchart");
 	let ctx = canvas.getContext("2d");
 	let myChart = new chart(ctx, {
 	    type: 'line',

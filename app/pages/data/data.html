@@ -25,9 +25,9 @@
   <br>
 
   <!-- Buttons for various graph plotting functions -->
-  <button small royal round (click)="store()">Store</button>
+  <!--<button small royal round (click)="store()">Store</button>
   <button small secondary round (click)="retrieve()">Retrieve</button>
-  <button small danger round (click)="clear()">Clear</button>  
+  <button small danger round (click)="clear()">Clear</button>-->  
 
   <br>
 
@@ -55,8 +55,26 @@
   
   <br>
 
-  <canvas id="chart" width={{canvasWidth}} height={{canvasHeight}}>Charts not supported</canvas>
+  
+  <div [ngSwitch]="segment">
+    <canvas *ngSwitchCase="'bpmgraph'" id="bpmchart" width={{canvasWidth}} height={{canvasHeight}}></canvas>
+    <canvas *ngSwitchCase="'stepgraph'" id="stepchart" width={{canvasWidth}} height={{canvasHeight}}></canvas>
+  </div>
 
+
+  
+  <div padding>
+    <ion-segment [(ngModel)]="segment">
+      <ion-segment-button value="bpmgraph">
+	BPM
+      </ion-segment-button>
+      <ion-segment-button value="stepgraph">
+	Steps
+      </ion-segment-button>
+    </ion-segment>
+  </div>
+
+  
 </ion-content>
 
 
