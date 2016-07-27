@@ -1,4 +1,20 @@
 .data {
 
+
+  #zoomin, #zoomout {
+    float:left;
+    width:23%;
+  }
+
+  #shiftleft, #shiftright {
+    float:right;
+    width:23%
+  }
+
+  #startdate, #enddate, #clear {
+    float:left;
+    width:32%;
+  }
+
 }
 

@@ -66,22 +66,30 @@ export class HttpService {
 
     /* Get helper function */
     get(d1,d2,requestFunction) {
-
+	
 	/* Create headers (includes token) */
 	let authHeaders = new Headers();
 	authHeaders.append('Authorization', 'Bearer ' + this.token);
 	authHeaders.append('Accept', 'application/json');
 
-	/* The url is the standard for get, plus the date queries */
+	/* This url is specific to heart rate, plus the date queries */
 	let url = "http://143.229.6.40:443/v1.0.M1/dataPoints?schema_namespace=omh&schem\
 a_name=heart-rate&schema_version=1.0&created_on_or_after=" + d1 + "&created_before=" + d2;
 
 
-	/* Request the data and return via the callback */
+	/* We will grab the heart rate data, and as long as that's successful, grab the step data */
 	this.http.get(url, { headers: authHeaders }).subscribe(
-			  data => {requestFunction(data);},
-			  error => alert("Heart rate get request failed (are you plugged in?)")
-		      );
+	    bpmdata => {
+		url = "http://143.229.6.40:443/v1.0.M1/dataPoints?schema_namespace=omh&schem\
+a_name=step-count&schema_version=1.0&created_on_or_after=" + d1 + "&created_before=" + d2;
+		/* Success: onto get #2 */
+		this.http.get(url, { headers: authHeaders }).subscribe(
+		    stepdata => {
+			/* Both were successful: return both data sets via success function */
+			requestFunction(bpmdata,stepdata);
+		    }, err => alert("Step data get request failed"));
+	    }, err => alert("Heart rate get request failed (are you plugged in?)")
+	);
 	
     }
 
@@ -169,7 +177,7 @@ a_name=heart-rate&schema_version=1.0&created_on_or_after=" + d1 + "&created_befo
 
     createStepJSON(value,startdate,enddate) {
 	/* The format of a post to the server */
-	let bpm_json = 
+	let step_json = 
 	    {
 		"header":{
 		    "id":"0",
@@ -195,18 +203,18 @@ a_name=heart-rate&schema_version=1.0&created_on_or_after=" + d1 + "&created_befo
 		}
 	    };
 
-	bpm_json.header.creation_date_time = enddate.toISOString();
+	step_json.header.creation_date_time = enddate.toISOString();
 	
 	/* Oftentimes when posting multiple numbers will be assigned IDs within the same
 	   millisecond. Add a counter to the end to combat this. */
-	bpm_json.header.id = new Date().getTime().toString() + "-" + this.appendIndex.toString();
-	bpm_json.body.step_count = value;
-	bpm_json.body.effective_time_frame.time_interval.start_date_time = startdate.toISOString();
-	bpm_json.body.effective_time_frame.time_interval.end_date_time = enddate.toISOString();
+	step_json.header.id = new Date().getTime().toString() + "-" + this.appendIndex.toString();
+	step_json.body.step_count = value;
+	step_json.body.effective_time_frame.time_interval.start_date_time = startdate.toISOString();
+	step_json.body.effective_time_frame.time_interval.end_date_time = enddate.toISOString();
 	
 	this.appendIndex++;
 	
-	return bpm_json;
+	return step_json;
 
 
 

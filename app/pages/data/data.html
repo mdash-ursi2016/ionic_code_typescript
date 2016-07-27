@@ -10,6 +10,11 @@
 
 <ion-content padding class="data">
 
+  <!-- DatePicker plugin buttons -->
+  <button small clear (click)="startDatePicker()" id="startdate">Start Date</button>
+  <button small clear (click)="endDatePicker()" id="enddate">End Date</button>
+  <button small danger outline (click)="clear()" id="clear">Clear</button>
+  
   <!-- Date pickers, disabled to simply display dates -->
   <ion-item>
     <ion-label>Start Date</ion-label>
@@ -22,39 +27,26 @@
   </ion-item>
 
 
-  <br>
-
-  <!-- Buttons for various graph plotting functions -->
-  <!--<button small royal round (click)="store()">Store</button>
-  <button small secondary round (click)="retrieve()">Retrieve</button>
-  <button small danger round (click)="clear()">Clear</button>-->  
-
-  <br>
-
   <!-- Display the current amount of time displayed on the graph -->
   <p> The current time interval is {{convertMS(timeDiff)}} </p>
 
 
   <!-- Buttons for various graph display settings -->
-  <button clear (click)="zoomIn()">
+  <button clear (click)="zoomIn()" id="zoomin">
     <ion-icon name="add"></ion-icon>
   </button>
-  <button clear (click)="zoomOut()">
+  <button clear (click)="zoomOut()" id="zoomout">
     <ion-icon name="remove"></ion-icon>
   </button>
-  <button clear (click)="shiftLeft()">
-    <ion-icon name="arrow-round-back"></ion-icon>
-  </button>
-  <button clear (click)="shiftRight()">
+  <button clear (click)="shiftRight()" id="shiftright">
     <ion-icon name="arrow-round-forward"></ion-icon>
   </button>
-
-  <!-- DatePicker plugin buttons -->
-  <button small dark (click)="startDatePicker()">Start</button>
-  <button small dark (click)="endDatePicker()">End</button>
+  <button clear (click)="shiftLeft()" id="shiftleft">
+    <ion-icon name="arrow-round-back"></ion-icon>
+  </button>
   
   <br>
-
+  
   
   <div [ngSwitch]="segment">
     <canvas *ngSwitchCase="'bpmgraph'" #bpmChart width={{canvasWidth}} height={{canvasHeight}}></canvas>
@@ -68,7 +60,7 @@
       <ion-segment-button (click)="retrieve()" value="bpmgraph">
 	BPM
       </ion-segment-button>
-      <ion-segment-button (click)="retrieve()" value="stepgraph">
+      <ion-segment-button favorite (click)="retrieve()" value="stepgraph">
 	Steps
       </ion-segment-button>
     </ion-segment>
@@ -79,5 +71,5 @@
 
 
 <ion-footer>
-  <button full (click)="getToken()">Obtain Authorization Token</button>
+  <button full dark (click)="getToken()">Obtain Authorization Token</button>
 </ion-footer>

@@ -1,5 +1,5 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
-import { Page, NavController, Toast } from 'ionic-angular';
+import { Page, NavController, Toast, Alert } from 'ionic-angular';
 import { DatePicker } from 'ionic-native';
 
 import { StorageService } from '../../services/storageservice/storageservice';
@@ -125,55 +125,82 @@ export class DataPage {
 	/* Clear out the graph data */
 	this.bpmLabels = [];
 	this.bpmPoints = [];
+	this.stepLabels = [];
+	this.stepPoints = [];
 
+	
 	let self = this;
 
 	/* Make a get request, with a callback function for graphing */
-	this.httpservice.makeGetRequest(d1,d2, function(dates) {
+	this.httpservice.makeGetRequest(d1,d2, function(bpmdata,stepdata) {
 
-	    /* Magic parsing techniques for the return value */
-	    dates = JSON.parse(dates._body);
-	    for (let i = 0; i < dates.length; i++) {
-		//let dtStr = dates[i].header.creation_date_time.toString();
-		//dtStr = dtStr.slice(5,10) + " " + dtStr.slice(11,16);
-		/* Push all of the dates as labels and values as points */
-		self.bpmLabels.push(dates[i].header.creation_date_time);
-		self.bpmPoints.push(dates[i].body.heart_rate.value);
+	    /* Get the bodies of the returned JSONs */
+	    bpmdata = JSON.parse(bpmdata._body);
+	    stepdata = JSON.parse(stepdata._body);
+
+	    /* Loop through both data sets and set up the points to graph for each */
+	    for (let i = 0; i < bpmdata.length; i++) {
+		self.bpmLabels.push(bpmdata[i].header.creation_date_time);
+		self.bpmPoints.push(bpmdata[i].body.heart_rate.value);
+	    }
+
+	    for (let i = 0; i < stepdata.length; i++) {
+		self.stepLabels.push(stepdata[i].header.creation_date_time);
+		self.stepPoints.push(stepdata[i].body.step_count);
 	    }
 	    
 	    self.makeChart();
 
 	});
-	
-	this.makeChart();
     }    
 	
     /* Erase the current graph and redraw with no data.
        This function should eventually be hidden in settings */
     clear() {
-	/* Delete the table and make a new one */
-	this.storage.clear();
-	this.storage.makeTable();
+	let prompt = Alert.create({
+	    title: "Clear Storage",
+	    message: "Are you sure you would like to clear out your storage and reset the graphs?",
+	    buttons: [
+		{
+		    text: "Cancel",
+		    handler: data => {},
+		},
+		{
+		    text: "I'm sure",
+		    handler: data => {
+			
 	
-	/* Notify the event with a Toast */
-	let toast = Toast.create({
-            message: 'Table Cleared',
-            duration: 2000,
-            position: 'bottom',
-	    showCloseButton: true
-        });
-        this.nav.present(toast);
-
-	/* Reset the data and redraw the graph */
-	this.bpmLabels = [];
-	this.bpmPoints = [];
-	this.makeChart();
+			/* Delete the table and make a new one */
+			this.storage.clear();
+			this.storage.makeTable();
+			
+			/* Notify the event with a Toast */
+			let toast = Toast.create({
+			    message: 'Table Cleared',
+			    duration: 2000,
+			    position: 'bottom',
+			    showCloseButton: true
+			});
+			this.nav.present(toast);
+			
+			/* Reset the data and redraw the graph */
+			this.bpmLabels = [];
+			this.bpmPoints = [];
+			this.stepLabels = [];
+			this.stepPoints = [];
+			this.makeChart();
+		    }
+		}]
+	});
+	
+	this.nav.present(prompt);
     }
 
 
     /* Chart.js graph routine */
     makeChart() {
-	//let canvas: any = document.getElementById("bpmchart")
+
+	/* Graph for the heart rate canvas */
 	if (this.bpmcanvas) {
 	    let bpmctx = this.bpmcanvas.nativeElement.getContext("2d");
 	    let bpmChart = new chart(bpmctx, {
@@ -211,15 +238,14 @@ export class DataPage {
 		    },
 		    scales: {
 			xAxes: [{
-			    type: 'time'
+			    type: 'time' /* Graph real dates */
 			}]
 		    }
 		}
 	    });
 	}
 
-	//let stepcanvas:any = document.getElementById("stepchart");
-	
+	/* Graph for the step count canvas */
 	if (this.stepcanvas) {
 	    let stepctx =  this.stepcanvas.nativeElement.getContext("2d");
 	    let stepChart = new chart(stepctx, {
@@ -242,7 +268,7 @@ export class DataPage {
 		    },
 		    scales: {
 			xAxes: [{
-			    type: 'time'
+			    type: 'time' /* Graph real dates */
 			}]
 		    }
 		}
