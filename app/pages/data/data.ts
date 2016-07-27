@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild, ElementRef } from '@angular/core';
 import { Page, NavController, Toast } from 'ionic-angular';
 import { DatePicker } from 'ionic-native';
 
@@ -19,15 +19,20 @@ export class DataPage {
     startDateString: string; /* String representing start and end dates (for DateTime picker */
     endDateString: string;
     timeDiff: number; /* Difference in ms between start and end dates */
-    labels: Array <any>; /* Labels (timestamps) of data points -- x-axis */
-    db: Array  <number>; /* values (bpms) of data points -- y-axis */
+    bpmLabels: Array <any>; /* Labels (timestamps) of data points -- x-axis */
+    bpmPoints: Array  <number>; /* values (bpms) of data points -- y-axis */
+    stepLabels: Array <any>;
+    stepPoints: Array <any>;
 
-    segment: string = "bpmgraph";
     
+    segment: string = "bpmgraph";
+
+    @ViewChild('bpmChart') bpmcanvas: ElementRef;
+    @ViewChild('stepChart') stepcanvas: ElementRef;
 
     constructor(private nav: NavController, private storage: StorageService, private httpservice: HttpService) {
 	/* Graph component */
-	this.canvasWidth = window.screen.width - 50;
+	this.canvasWidth = window.screen.width;
 	this.canvasHeight = window.screen.height / 3;
 
 	/* Create the graph to display at first as the last 24 hours */
@@ -43,14 +48,17 @@ export class DataPage {
 	/* Record the time between the start and end dates in milliseconds.
 	   Initially one day */
 	this.timeDiff = Math.abs(this.startDate - this.endDate);
+
+	this.bpmLabels = [];
+	this.bpmPoints = [];
+	this.stepLabels = [];
+	this.stepPoints = [];
+	
     }
 
     /* Draw an empty graph when the page enters */
     ionViewDidEnter()
-    {
-	this.labels = [];
-	this.db = [];
-	
+    {		
 	/* Initial Graphing */
 	this.retrieve();
     }
@@ -115,8 +123,8 @@ export class DataPage {
 	let d2 = new Date(s2[0],s2[1],s2[2],s2[3],s2[4]).toISOString();
 	
 	/* Clear out the graph data */
-	this.labels = [];
-	this.db = [];
+	this.bpmLabels = [];
+	this.bpmPoints = [];
 
 	let self = this;
 
@@ -126,16 +134,18 @@ export class DataPage {
 	    /* Magic parsing techniques for the return value */
 	    dates = JSON.parse(dates._body);
 	    for (let i = 0; i < dates.length; i++) {
-		let dtStr = dates[i].header.creation_date_time.toString();
-		dtStr = dtStr.slice(5,10) + " " + dtStr.slice(11,16);
+		//let dtStr = dates[i].header.creation_date_time.toString();
+		//dtStr = dtStr.slice(5,10) + " " + dtStr.slice(11,16);
 		/* Push all of the dates as labels and values as points */
-		self.labels.push(dtStr);
-		self.db.push(dates[i].body.heart_rate.value);
+		self.bpmLabels.push(dates[i].header.creation_date_time);
+		self.bpmPoints.push(dates[i].body.heart_rate.value);
 	    }
 	    
 	    self.makeChart();
 
 	});
+	
+	this.makeChart();
     }    
 	
     /* Erase the current graph and redraw with no data.
@@ -155,58 +165,89 @@ export class DataPage {
         this.nav.present(toast);
 
 	/* Reset the data and redraw the graph */
-	this.labels = [];
-	this.db = [];
+	this.bpmLabels = [];
+	this.bpmPoints = [];
 	this.makeChart();
     }
 
 
     /* Chart.js graph routine */
     makeChart() {
-	let canvas: any = document.getElementById("bpmchart");
-	let ctx = canvas.getContext("2d");
-	let myChart = new chart(ctx, {
-	    type: 'line',
-	    data: {
-		labels: this.labels, /* data labels */
-		datasets: [{
-		    label: "Heart Rate",
-		    fill: false,
-		    lineTension: 0.1,
-		    backgroundColor: "rgba(75,192,192,0.4)",
-		    borderColor: "rgba(75,192,192,1)",
-		    borderCapStyle: 'butt',
-		    borderDash: [],
-		    borderDashOffset: 0.0,
-		    borderJoinStyle: 'miter',
-		    pointBorderColor: "rgba(75,192,192,1)",
-		    pointBackgroundColor: "#fff",
-		    pointBorderWidth: 1,
-		    pointHoverRadius: 5,
-		    pointHoverBackgroundColor: "rgba(75,192,192,1)",
-		    pointHoverBorderColor: "rgba(220,220,220,1)",
-		    pointHoverBorderWidth: 2,
-		    pointRadius: 1,
-		    pointHitRadius: 10,
-		    data: this.db, /* data points */
-		    borderWidth: 1
-		}]
-	    },
-	    options: {
-		legend: {
-		    labels: {
-			boxWidth: 12 /* Width of legend box */
-		    }
-		},
-		scales: {
-		    xAxes: [{
-			ticks: {
-			    maxTicksLimit: 20 /* Max dates to label */
-			}
+	//let canvas: any = document.getElementById("bpmchart")
+	if (this.bpmcanvas) {
+	    let bpmctx = this.bpmcanvas.nativeElement.getContext("2d");
+	    let bpmChart = new chart(bpmctx, {
+		type: 'line',
+		data: {
+		    labels: this.bpmLabels, /* data labels */
+		    datasets: [{
+			label: "Heart Rate",
+			fill: false,
+			lineTension: 0.1,
+			backgroundColor: "rgba(75,192,192,0.4)",
+			borderColor: "rgba(75,192,192,1)",
+			borderCapStyle: 'butt',
+			borderDash: [],
+			borderDashOffset: 0.0,
+			borderJoinStyle: 'miter',
+			pointBorderColor: "rgba(75,192,192,1)",
+			pointBackgroundColor: "#fff",
+			pointBorderWidth: 1,
+			pointHoverRadius: 5,
+			pointHoverBackgroundColor: "rgba(75,192,192,1)",
+			pointHoverBorderColor: "rgba(220,220,220,1)",
+			pointHoverBorderWidth: 2,
+			pointRadius: 1,
+			pointHitRadius: 10,
+			data: this.bpmPoints, /* data points */
+			borderWidth: 1
 		    }]
+		},
+		options: {
+		    legend: {
+			labels: {
+			    boxWidth: 12 /* Width of legend box */
+			}
+		    },
+		    scales: {
+			xAxes: [{
+			    type: 'time'
+			}]
+		    }
 		}
-	    }
-	});
+	    });
+	}
+
+	//let stepcanvas:any = document.getElementById("stepchart");
+	
+	if (this.stepcanvas) {
+	    let stepctx =  this.stepcanvas.nativeElement.getContext("2d");
+	    let stepChart = new chart(stepctx, {
+		type: 'bar',
+		data: {
+		    labels: this.stepLabels, /* data labels */
+		    datasets: [{
+			label: "Step Count",
+			backgroundColor: "rgba(75,192,192,0.4)",
+			borderColor: "rgba(75,192,192,1)",
+			data: this.stepPoints, /* data points */
+			borderWidth: 1
+		    }]
+		},
+		options: {
+		    legend: {
+			labels: {
+			    boxWidth: 12 /* Width of legend box */
+			}
+		    },
+		    scales: {
+			xAxes: [{
+			    type: 'time'
+			}]
+		    }
+		}
+	    });
+	}
     }
 
     /* Convert a millisecond time to days, hours, minutes, seconds.
@@ -245,10 +286,11 @@ export class DataPage {
 	    date => {
 		this.startDate = date;
 		this.startDateString = this.formatLocalDate(date);
+		this.timeDiff = Math.abs(this.startDate - this.endDate);
+		this.retrieve();
 	    },
 	    err => console.log("Error occurred while getting date:", err)
 	);
-	this.timeDiff = Math.abs(this.startDate - this.endDate);
 
     }
 
@@ -262,10 +304,12 @@ export class DataPage {
             date => {
                 this.endDate = date;
                 this.endDateString = this.formatLocalDate(date);
+		this.timeDiff = Math.abs(this.startDate - this.endDate);
+		this.retrieve();
             },
             err => console.log("Error occurred while getting date:", err)
         );
-	this.timeDiff = Math.abs(this.startDate - this.endDate);
+
     }
 
 

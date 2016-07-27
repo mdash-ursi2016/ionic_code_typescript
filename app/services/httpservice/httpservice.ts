@@ -80,7 +80,7 @@ a_name=heart-rate&schema_version=1.0&created_on_or_after=" + d1 + "&created_befo
 	/* Request the data and return via the callback */
 	this.http.get(url, { headers: authHeaders }).subscribe(
 			  data => {requestFunction(data);},
-			  error => alert("Get request failed (are you plugged in?)")
+			  error => alert("Heart rate get request failed (are you plugged in?)")
 		      );
 	
     }

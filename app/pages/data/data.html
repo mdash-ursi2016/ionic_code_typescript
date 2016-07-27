@@ -57,18 +57,18 @@
 
   
   <div [ngSwitch]="segment">
-    <canvas *ngSwitchCase="'bpmgraph'" id="bpmchart" width={{canvasWidth}} height={{canvasHeight}}></canvas>
-    <canvas *ngSwitchCase="'stepgraph'" id="stepchart" width={{canvasWidth}} height={{canvasHeight}}></canvas>
+    <canvas *ngSwitchCase="'bpmgraph'" #bpmChart width={{canvasWidth}} height={{canvasHeight}}></canvas>
+    <canvas *ngSwitchCase="'stepgraph'" #stepChart width={{canvasWidth}} height={{canvasHeight}}></canvas>
   </div>
 
 
   
   <div padding>
     <ion-segment [(ngModel)]="segment">
-      <ion-segment-button value="bpmgraph">
+      <ion-segment-button (click)="retrieve()" value="bpmgraph">
 	BPM
       </ion-segment-button>
-      <ion-segment-button value="stepgraph">
+      <ion-segment-button (click)="retrieve()" value="stepgraph">
 	Steps
       </ion-segment-button>
     </ion-segment>
