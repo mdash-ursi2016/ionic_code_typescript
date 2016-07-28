@@ -238,7 +238,11 @@ export class DataPage {
 		    },
 		    scales: {
 			xAxes: [{
-			    type: 'time' /* Graph real dates */
+			    type: 'time', /* Graph real dates */
+			    time: {
+				max: this.endDate,
+				min: this.startDate
+			    }
 			}]
 		    }
 		}
@@ -254,7 +258,8 @@ export class DataPage {
 		    labels: this.stepLabels, /* data labels */
 		    datasets: [{
 			label: "Step Count",
-			backgroundColor: "rgba(75,192,192,0.4)",
+			backgroundColor: ["rgba(75,192,192,0.4)",
+					  "rgba(166,77,255,0.4)"],
 			borderColor: "rgba(75,192,192,1)",
 			data: this.stepPoints, /* data points */
 			borderWidth: 1
@@ -268,7 +273,12 @@ export class DataPage {
 		    },
 		    scales: {
 			xAxes: [{
-			    type: 'time' /* Graph real dates */
+			    type: 'time', /* Graph real dates */
+			    time: {
+				//max: this.endDate,
+				//min: this.startDate
+			    }
+			    //categoryPercentage:0.07
 			}]
 		    }
 		}

@@ -173,6 +173,7 @@ export class BLService {
 	    
 	    let startdate: number = (data[1] << 16) + (data[0]);
 	    let enddate: number = startdate + data[2];
+	    
 	    this.storage.storeStep(new Date(startdate * 1000),
 				   new Date(enddate * 1000),
 				   data[3]);
