@@ -88,7 +88,7 @@ a_name=step-count&schema_version=1.0&created_on_or_after=" + d1 + "&created_befo
 			/* Both were successful: return both data sets via success function */
 			requestFunction(bpmdata,stepdata);
 		    }, err => alert("Step data get request failed"));
-	    }, err => alert("Heart rate get request failed (are you plugged in?)")
+	    }, err => alert("Heart rate get request failed. Ensure that your device and the server are online.")
 	);
 	
     }

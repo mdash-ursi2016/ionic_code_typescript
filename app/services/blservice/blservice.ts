@@ -66,7 +66,7 @@ export class BLService {
 	    this.peripheral = peripheral;
             this.connected(peripheral);
         }, error => {
-	    console.log("Peripheral was disconnected");
+	    console.log("Peripheral was disconnected.");
 	    this.disconnect();
 	});
     }
@@ -250,7 +250,7 @@ export class BLService {
 		});
 	    }, () => {
 		/* Otherwise we shouldn't be conencted to anything at all */
-		alert("You are not connected to a device");
+		alert("You are not connected to a device.");
 	    });
 	});
     }

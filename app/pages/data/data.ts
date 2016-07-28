@@ -266,6 +266,7 @@ export class DataPage {
 		    }]
 		},
 		options: {
+		    mode: 'label',
 		    legend: {
 			labels: {
 			    boxWidth: 12 /* Width of legend box */
@@ -275,10 +276,18 @@ export class DataPage {
 			xAxes: [{
 			    type: 'time', /* Graph real dates */
 			    time: {
-				//max: this.endDate,
-				//min: this.startDate
+				max: this.endDate,
+				min: this.startDate,
+			    },
+			    stacked: true,
+			    categoryPercentage:0.2,
+			    //barPercentage: .8,
+			    scaleLabel: {
+				display: false
 			    }
-			    //categoryPercentage:0.07
+			}],
+			yAxes: [{
+			    stacked: true
 			}]
 		    }
 		}

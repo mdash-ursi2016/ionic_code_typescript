@@ -43,14 +43,21 @@
     </ion-item>
 
     <!-- Enabling/Disabling Background Mode -->
+    <!--
+	<ion-item>
+	    <ion-label>Background Mode</ion-label>
+	    <ion-toggle checked="bgToggled" [(ngModel)]="bgToggled" (ionChange)="bgToggle()"></ion-toggle>
+	</ion-item>
+	-->
     <ion-item>
-      <ion-label>Background Mode</ion-label>
-      <ion-toggle checked="bgToggled" [(ngModel)]="bgToggled" (ionChange)="bgToggle()"></ion-toggle>
+      <button block royal (click)="bgToggle()">Toggle Background Mode
+	<ion-icon name="browser"></ion-icon>
+      </button>
     </ion-item>
 
     <!-- Current status of scan -->
     <ion-item>
-      <h3 style="text-align:center;font-family:Arial;color:#333399"><b>Status: {{statusDiv}}</b></h3>
+      <h3 style="text-align:center;font-family:Arial"><b>Status: {{statusDiv}}</b></h3>
     </ion-item>
   </ion-list>
 
