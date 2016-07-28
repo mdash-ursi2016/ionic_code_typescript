@@ -55,8 +55,12 @@ class MyApp {
                 text: "Collecting Data"
 	    });
 
-            /* Enable background mode and set the heads up notification text */
-            //cordova.plugins.backgroundMode.enable();
+	    /* Enable background mode and set the heads up notification text */
+	    this.storage.retrieveBackgroundMode().then(bg => {
+		if (bg)
+		    cordova.plugins.backgroundMode.enable();
+	    });
+
 
             /* Initial auto-connect */
             //this.resumeOperations();
@@ -85,7 +89,10 @@ class MyApp {
 	console.log("paused...");
 
 	/* On app leave, disconnect immediately */
-	this.blservice.disconnect();
+
+	this.blservice.checkExistingBluetooth().then(() => {
+	    this.blservice.disconnect();
+	},() => console.log("Paused, but not connected to device"));
 
 	/* Every 5 minutes, reconnect with this method */
 	setTimeout(() => {
