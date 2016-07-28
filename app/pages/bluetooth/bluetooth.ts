@@ -17,14 +17,15 @@ export class BluetoothPage {
     deviceList: any; /* List of found bluetooth devices on scan */
     statusDiv: string; /* The current status to display */
     scanTime: number; /* Time to scan for, set from Range */
-    bgToggled: boolean; /* boolean if background mode is enabled */
-
+    bgText: string;
+    
 
     constructor(private bl:BLService, private nav: NavController, private storage: StorageService) {
 
 	this.deviceList = [];
 	this.statusDiv = "Undefined";
 	this.scanTime = 3;
+	this.bgText = "Background Mode Toggle";
     }
 
     
@@ -53,6 +54,11 @@ export class BluetoothPage {
 	    () => {this.statusDiv = "Disconnected";}
 	);
 
+	/* Set text of the background mode toggle button */
+	if (cordova.plugins.backgroundMode.isEnabled())
+	    this.bgText = "Disable Background Mode";
+	else
+	    this.bgText = "Enable Background Mode";
     }
 
     /* Scan for a device */
@@ -104,6 +110,8 @@ export class BluetoothPage {
 	/* If already enabled, disable, notify user */
         if (cordova.plugins.backgroundMode.isEnabled()) {
             cordova.plugins.backgroundMode.disable();
+	    this.bgText = "Enable Background Mode";
+	    this.storage.storeBackgroundMode(null);
             let toast = Toast.create({
                 message: "Background Mode Disabled",
                 duration: 2000,
@@ -115,6 +123,10 @@ export class BluetoothPage {
         /* Otherwise already disabled, so enable, notify user */
         else {
             cordova.plugins.backgroundMode.enable();
+	    this.bgText = "Disable Background Mode";
+	    /* Note that since storage works with strings, this could
+	       be any string. More intuitive this way */
+	    this.storage.storeBackgroundMode(true);
             let toast = Toast.create({
                 message: "Background Mode Enabled",
                 duration: 2000,
@@ -125,7 +137,6 @@ export class BluetoothPage {
         }
 	
     }
-
 
 }
 

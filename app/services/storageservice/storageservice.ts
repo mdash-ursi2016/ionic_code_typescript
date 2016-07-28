@@ -98,5 +98,12 @@ export class StorageService {
 	return this.storage.get('laststepcount');
     }
 
+    /* Permanent settings for background mode */
+    storeBackgroundMode(bg) {
+	this.storage.set('bg',bg);
+    }
+    retrieveBackgroundMode() {
+	return this.storage.get('bg');
+    }
 
 }
