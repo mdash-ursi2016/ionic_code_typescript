@@ -29,7 +29,7 @@ export class BLService {
 	    heartratebundle: '3cd43730-fc61-4ea7-aa18-6e7c3d798d74', /* BPM bundle characteristic [4x 4 byte date, 1 byte bpm] */
 	    datecheck: '3750215f-b147-4bdf-9271-0b32c1c5c49d', /* Verifying timestamp characteristic [4 byte date] */
 	    steps: '81d4ef8b-bb65-4fef-b701-2d7d9061e492', /* Step data - [4 byte date, 2 byte date difference, 2 byte steps] */
-	    livesteps: 'f579caa3-9390-46ae-ac67-1445b6f5b9fd'
+	    livesteps: 'f579caa3-9390-46ae-ac67-1445b6f5b9fd' /* Live step data - [1 byte step count] */
 	};
 
 	this.totalSteps = 0;
@@ -170,7 +170,8 @@ export class BLService {
 	    let data = new Uint16Array(buffer);
 
 	    this.lastStepCount = 0;
-	    
+
+	    /* Rearrange for the startdate, enddate is startdate + offset */
 	    let startdate: number = (data[1] << 16) + (data[0]);
 	    let enddate: number = startdate + data[2];
 	    
@@ -178,6 +179,7 @@ export class BLService {
 				   new Date(enddate * 1000),
 				   data[3]);
 
+	    /* If there is a fifth item, it is the active data */
 	    if (data.length === 5) {
 		this.storage.storeActive(new Date(startdate * 1000),
 					 new Date(enddate * 1000),
@@ -229,8 +231,6 @@ export class BLService {
 	);
 
     }
-
-
 
 
     /* Called when the user wants to sever the Bluetooth connection */
