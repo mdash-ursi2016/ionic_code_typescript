@@ -17,7 +17,7 @@ export class BluetoothPage {
     deviceList: any; /* List of found bluetooth devices on scan */
     statusDiv: string; /* The current status to display */
     scanTime: number; /* Time to scan for, set from Range */
-    bgText: string;
+    bgText: string; /* Text on the background mode button */
     
 
     constructor(private bl:BLService, private nav: NavController, private storage: StorageService) {
