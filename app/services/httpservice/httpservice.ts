@@ -132,95 +132,71 @@ a_name=step-count&schema_version=1.0&created_on_or_after=" + d1 + "&created_befo
 		      );
     }
 
-    
-    /* Change the JSON template with desired information */
-    createBPMJSON(value,date) {
-	/* The format of a post to the server */
-	let bpm_json = 
+    /* Create a JSON in the appropriate format for a post. info is an object with the fields:
+         - datatype: string -> the type of json to be created
+	 - value: number -> data received
+	 - * startdate: date -> start date of data (for multiple date posts)
+	 - * enddate: date -> start date of data (for multiple date posts)
+	 - * date: date -> date of data (for single date posts)
+    */
+    createJSON(info) {
+	/* The base object type for all postings */
+	let json: any =
 	    {
 		"header":{
-		    "id":"0",
-		    "creation_date_time":"SOME_TIMESTAMP",
+		    "id":"ID",
+		    "creation_date_time":"TIMESTAMP",
 		    "acquisition_provenance":{
 			"source_name":"arduino",
 			"modality":"sensed"
 		    },
-		    "schema_id":{
-			"namespace":"omh",
-			"name":"heart-rate",
-			"version":"1.0"
+		    "schema_id": {
+			"namespace:":"omh",
+			"version":"1.0",
+			"name":"NAME"
 		    }
 		},
 		"body":{
-		    "heart_rate": {
-			"value":0,
-			"unit":"beats/min"
-		    },
-		    "effective_time_frame":{
-			"date_time":"SOME_TIMESTAMP"
+		    "effective_time_frame": {
 		    }
 		}
-	    };
+	    }
 
-	bpm_json.header.creation_date_time = date.toISOString();
-	
-	/* Oftentimes when posting multiple numbers will be assigned IDs within the same
-	   millisecond. Add a counter to the end to combat this. */
-	bpm_json.header.id = new Date().getTime().toString() + "-" + this.appendIndex.toString();
-	bpm_json.body.heart_rate.value = value;
-	bpm_json.body.effective_time_frame.date_time = date.toISOString();
-	
+	/* Add in the id, creation date time (now), and name of data type */
+	json.header.id = new Date().getTime().toString() + "-" + this.appendIndex.toString();
+	json.header.creation_date_time = new Date().getTime().toString();
+	json.header.schema_id.name = info.datatype;
+
+	/* Used for unique ids, increment for next posting */
 	this.appendIndex++;
-	
-	return bpm_json;
+
+	/* Create JSON specific to heart rate */
+	if (info.datatype === "heart-rate") {
+	    json.body.effective_time_frame.date_time = info.date.toISOString();
+	    json.body.heart_rate = {"value": info.value,
+				    "unit": "beats/min"};
+	}
+
+	/* Specific to step count */
+	else if (info.datatype === "step-count") {
+	    json.body.effective_time_frame.time_interval = {"start_date_time": info.startdate.toISOString(),
+							    "end_date_time": info.enddate.toISOString()};
+	    json.body.step_count = info.value;
+	}
+
+	/* Specific to activity */
+	else if (info.datatype === "minutes-moderate-activity") {
+	    json.body.effective_time_frame.time_interval = {"start_date_time": info.startdate.toISOString(),
+							    "end_date_time": info.enddate.toISOString()};
+	    json.body.minutes_moderate_activity = {"value": info.value,
+						   "unit": "min"};
+	}
+
+	else console.log("Data type not recognized in JSON creation");
+
+
+	return json;
     }
 
-    createStepJSON(value,startdate,enddate) {
-	/* The format of a post to the server */
-	let step_json = 
-	    {
-		"header":{
-		    "id":"0",
-		    "creation_date_time":"SOME_TIMESTAMP",
-		    "acquisition_provenance":{
-			"source_name":"arduino",
-			"modality":"sensed"
-		    },
-		    "schema_id":{
-			"namespace":"omh",
-			"name":"step-count",
-			"version":"1.0"
-		    }
-		},
-		"body":{
-		    "step_count":0,
-		    "effective_time_frame":{
-			"time_interval":{
-			    "start_date_time":"SOME_TIMESTAMP",
-			    "end_date_time":"SOME_TIMESTAMP"
-			}
-		    }
-		}
-	    };
-
-	step_json.header.creation_date_time = enddate.toISOString();
-	
-	/* Oftentimes when posting multiple numbers will be assigned IDs within the same
-	   millisecond. Add a counter to the end to combat this. */
-	step_json.header.id = new Date().getTime().toString() + "-" + this.appendIndex.toString();
-	step_json.body.step_count = value;
-	step_json.body.effective_time_frame.time_interval.start_date_time = startdate.toISOString();
-	step_json.body.effective_time_frame.time_interval.end_date_time = enddate.toISOString();
-	
-	this.appendIndex++;
-	
-	return step_json;
-
-
-
-
-    }
-
-    
 
 }

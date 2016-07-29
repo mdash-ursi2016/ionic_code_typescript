@@ -13,15 +13,18 @@ export class StorageService {
 
     /* Create new tables, as long as they don't already exist, with datetime and integer columns */
     makeTable() {
-	this.storage.query('CREATE TABLE IF NOT EXISTS bpmTable(bpmdate DATETIME, bpm INTEGER)').then(
-	    function() {},
-	    function() {alert("Failed to create bpm table");}
-	);
-
-	this.storage.query('CREATE TABLE IF NOT EXISTS stepTable(stepstartdate DATETIME, stependdate DATETIME, step INTEGER)').then(
-	    function() {},
-	    function() {alert("Failed to create step table");}
-	);
+	this.storage.query('CREATE TABLE IF NOT EXISTS '
+			   + 'bpmTable(bpmdate DATETIME, bpm INTEGER);' +
+			   'CREATE TABLE IF NOT EXISTS '
+			   + 'stepTable(stepstartdate DATETIME, stependdate DATETIME, step INTEGER);' +
+			   'CREATE TABLE IF NOT EXISTS '
+			   + 'activeTable(activestartdate DATETIME, activeenddate DATETIME, active INTEGER)'
+			  ).then(() => {},
+				 () => alert("Failed to create tables"));
+	
+	this.retrieveBPM().then(dat => alert(JSON.stringify(dat)),err => alert(JSON.stringify(err)));
+	this.retrieveStep().then(dat => alert(JSON.stringify(dat)),err => alert(JSON.stringify(err)));
+	this.retrieveActive().then(dat => alert(JSON.stringify(dat)),err => alert(JSON.stringify(err)));
     }
 	
 
@@ -41,6 +44,13 @@ export class StorageService {
 	    function(err) {console.log("Failed to store step data: " + JSON.stringify(err));}
 	);
     }
+
+    storeActive(startdate,enddate,newVal) {
+	this.storage.query('INSERT INTO activeTable(activestartdate,activeenddate,active) VALUES(?,?,?)',[startdate,enddate,newVal]).then(
+	    function() {},
+	    function(err) {console.log("Failed to store active date: " + JSON.stringify(err));}
+	);
+    }
     
     
     /* Retrieve all bpm data points */
@@ -54,6 +64,10 @@ export class StorageService {
 	return this.storage.query('SELECT * FROM stepTable');
     }
 
+    retrieveActive() {
+	return this.storage.query('SELECT * FROM activeTable');
+    }
+
     
 
     /* Delete the tables */
@@ -65,6 +79,10 @@ export class StorageService {
 	this.storage.query('DROP TABLE IF EXISTS stepTable').then(
 	    function() {},
 	    function() {alert("Failed to delete step table");}
+	);
+	this.storage.query('DROP TABLE IF EXISTS activeTable').then(
+	    function() {},
+	    function() {alert("Failed to delete active table");}
 	);
     }
 

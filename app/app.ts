@@ -164,56 +164,63 @@ class MyApp {
 	    this.jsons = [];
 	    
 	    /* Grab all the data from storage */
-	    this.storage.retrieveBPM().then(
-		bpmData => {
+	    this.storage.retrieveBPM().then(bpmData => {
+		this.storage.retrieveStep().then(stepData => {
+		    this.storage.retrieveActive().then(activeData => {
+				
+			/* Format the step data in appropriate JSON and add to common list */
+			for (let i = 0; i < stepData.res.rows.length; i++) {
+			   
+			    this.jsons.push(this.httpservice.createJSON(
+				{"datatype":"step-count",
+				 "startdate":new Date(stepData.res.rows.item(i).stepstartdate),
+				 "enddate":new Date(stepData.res.rows.item(i).stependdate),
+				 "value":stepData.res.rows.item(i).step}
+			    ));
+			}
+					    
+			/* Format the bpm data in appropriate JSON and add to common list */
+			for (let i = 0; i < bpmData.res.rows.length; i++) {
+			    this.jsons.push(this.httpservice.createJSON(
+				{"datatype":"heart-rate",
+				 "date":new Date(bpmData.res.rows.item(i).bpmdate),
+				 "value":bpmData.res.rows.item(i).bpmdate}
+			    ));
+			}
 
-		    this.storage.retrieveStep().then(
-			stepData => {
-
-			    /* Format the step data in appropriate JSON and add to common list */
-			    for (let i = 0; i < stepData.res.rows.length; i++) {
-				this.jsons.push(this.httpservice.createStepJSON(
-				    stepData.res.rows.item(i).step,
-				    new Date(stepData.res.rows.item(i).stepstartdate),
-				    new Date(stepData.res.rows.item(i).stependdate)));
-			    }
-
-			    /* Format the bpm data in appropriate JSON and add to common list */
-			    for (let i = 0; i < bpmData.res.rows.length; i++) {
-				this.jsons.push(this.httpservice.createBPMJSON(
-				    bpmData.res.rows.item(i).bpm,
-				    new Date(bpmData.res.rows.item(i).bpmdate)));
-			    }
-
-
-			    /* If there's any data, we want to post it */
-			    if (this.jsons.length > 0) {
-				let self = this;
-				this.httpservice.makePostRequest(this.jsons, function() {
-				    /* Success callback if the data was posted. Clear out the storage */
-				    self.storage.clear();
-				    self.storage.makeTable();
-				    let toast = Toast.create({
-					message: "Data posted to server (" + self.jsons.length + " data points)",
-					duration: 2000,
-					position: 'bottom',
-					showCloseButton: true
-				    });
-				    self.nav.present(toast);
+			/* Format the active data in appropriate JSON and add to common list */
+			for (let i = 0; i < activeData.res.rows.length; i++) {
+			    this.jsons.push(this.httpservice.createJSON(
+				{"datatype":"minutes-moderate-activity",
+				 "startdate":new Date(activeData.res.rows.item(i).activestartdate),
+				 "enddate":new Date(activeData.res.rows.item(i).activeenddate),
+				 "value":activeData.res.rows.item(i).active}
+			    ));
+			}
+			
+			
+			/* If there's any data, we want to post it */
+			if (this.jsons.length > 0) {
+			    let self = this;
+			    this.httpservice.makePostRequest(this.jsons, function() {
+				/* Success callback if the data was posted. Clear out the storage */
+				self.storage.clear();
+				self.storage.makeTable();
+				let toast = Toast.create({
+				    message: "Data posted to server (" + self.jsons.length + " data points)",
+				    duration: 2000,
+				    position: 'bottom',
+				    showCloseButton: true
 				});
-			    }
-
-			}, err => { alert("Step Retrieval Error"); }
-		    );
-		    
-
-		}, err => {
-		    alert("BPM Retrieval Error");
-		}
-	    );
+				self.nav.present(toast);
+			    });
+			}
+		    }, err => alert("Active Retrieval Error"));
+		}, err => alert("Step Retrieval Error")); 
+	    }, err => alert("BPM Retrieval Error"));
 	    /* Repeat this function again in 5 minutes */
 	    this.pushTimer();
-	}, 120000);
+	}, 30000);
     }
 
 

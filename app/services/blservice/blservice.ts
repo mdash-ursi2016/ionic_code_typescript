@@ -177,6 +177,12 @@ export class BLService {
 	    this.storage.storeStep(new Date(startdate * 1000),
 				   new Date(enddate * 1000),
 				   data[3]);
+
+	    if (data.length === 5) {
+		this.storage.storeActive(new Date(startdate * 1000),
+					 new Date(enddate * 1000),
+					 data[4]);
+	    }
 	});
 
 	/* Live step subscription is just a current step, forward it */
