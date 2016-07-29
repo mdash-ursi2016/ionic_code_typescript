@@ -39,8 +39,8 @@ class MyApp {
 	this.pages = [
 	    { title: 'Home', component: HomePage, icon: 'pulse' },
 	    { title: 'Data Visualization', component: DataPage, icon: 'podium' },
-	    { title: 'Bluetooth Settings', component: BluetoothPage, icon: 'settings' },
-	    { title: 'About', component: AboutPage, icon: 'nutrition' }
+	    { title: 'Settings', component: BluetoothPage, icon: 'settings' },
+	    { title: 'About', component: AboutPage, icon: 'leaf' }
 	];
 	
     }

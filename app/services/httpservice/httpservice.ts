@@ -20,7 +20,7 @@ export class HttpService {
 	return new Promise(function(resolve, reject) {
 
 	    /* Open the URL in app without header information (URL, back/forward buttons, etc.) */
-	    let browserRef = InAppBrowser.open("https://143.229.6.40:80/oauth/authorize?response_type=token&client_id=vassarOMH&redirect_uri=https://143.229.6.40:80/&scope=write_data_points%20read_data_points", "_blank","location=no");
+	    let browserRef = InAppBrowser.open("https://143.229.6.40:443/oauth/authorize?response_type=token&client_id=vassarOMH&redirect_uri=https://143.229.6.40:443/&scope=write_data_points%20read_data_points", "_blank","location=no");
 	    
 	    /* When the browser reloads, check the URL */
 	    browserRef.addEventListener("loadstart", (event) => {
@@ -73,14 +73,14 @@ export class HttpService {
 	authHeaders.append('Accept', 'application/json');
 
 	/* This url is specific to heart rate, plus the date queries */
-	let url = "https://143.229.6.40:443/v1.0.M1/dataPoints?schema_namespace=omh&schem\
+	let url = "https://143.229.6.40:8083/v1.0.M1/dataPoints?schema_namespace=omh&schem\
 a_name=heart-rate&schema_version=1.0&created_on_or_after=" + d1 + "&created_before=" + d2;
 
 
 	/* We will grab the heart rate data, and as long as that's successful, grab the step data */
 	this.http.get(url, { headers: authHeaders }).subscribe(
 	    bpmdata => {
-		url = "https://143.229.6.40:443/v1.0.M1/dataPoints?schema_namespace=omh&schem\
+		url = "https://143.229.6.40:8083/v1.0.M1/dataPoints?schema_namespace=omh&schem\
 a_name=step-count&schema_version=1.0&created_on_or_after=" + d1 + "&created_before=" + d2;
 		/* Success: onto get #2 */
 		this.http.get(url, { headers: authHeaders }).subscribe(
@@ -122,7 +122,7 @@ a_name=step-count&schema_version=1.0&created_on_or_after=" + d1 + "&created_befo
 	authHeaders.append('Content-Type', 'application/json');
 
 	/* Post the data */
-	this.http.post("https://143.229.6.40:443/v1.0.M1/dataPoints/multi",
+	this.http.post("https://143.229.6.40:8083/v1.0.M1/dataPoints/multi",
 		       JSON.stringify(value), /* Value here is an array of JSONs in server compatible format */
 		      { headers:authHeaders }).subscribe(
 			  data => success(),
