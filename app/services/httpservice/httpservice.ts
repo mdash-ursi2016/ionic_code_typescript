@@ -88,7 +88,7 @@ a_name=step-count&schema_version=1.0&created_on_or_after=" + d1 + "&created_befo
 			/* Both were successful: return both data sets via success function */
 			requestFunction(bpmdata,stepdata);
 		    }, err => alert("Step data get request failed"));
-	    }, err => alert("Get request failed. Ensure that your device and the server are online.")
+	    }, err => alert("Get request failed. Ensure that your device and the server are online and that your access token is valid.")
 	);
 	
     }
@@ -127,7 +127,7 @@ a_name=step-count&schema_version=1.0&created_on_or_after=" + d1 + "&created_befo
 		      { headers:authHeaders }).subscribe(
 			  data => success(),
 			  error => {
-			      alert("Post error. Is your token valid and are you online?");
+			      alert("Post request failed. Ensure that your device and the server are online and that your access token is valid.");
 			  }
 		      );
     }

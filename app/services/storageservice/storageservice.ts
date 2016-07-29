@@ -63,7 +63,6 @@ export class StorageService {
     
     /* Retrieve all bpm data points */
     retrieveBPM() {
-	//return this.storage.query('SELECT * FROM dataTable WHERE date BETWEEN ? AND ?',[date1,date2]);
 	return this.storage.query('SELECT * FROM bpmTable');
     }
 
@@ -72,6 +71,7 @@ export class StorageService {
 	return this.storage.query('SELECT * FROM stepTable');
     }
 
+    /* Retrieve all active data points */
     retrieveActive() {
 	return this.storage.query('SELECT * FROM activeTable');
     }
@@ -94,32 +94,26 @@ export class StorageService {
 	);
     }
 
-    /* Save the token */
+    /* Permanent storage for the Auth Token */
     storeToken(token) {
 	this.storage.set('token',token);
     }
-
-    /* Retrieve the token */
     retrieveToken() {
 	return this.storage.get('token');
     }
 
-    /* Save the peripheral id */
+    /* Permanent storage for the peripheral's ID */
     storePeripheral(id) {
 	this.storage.set('peripheral',id);
     }
-
-    /* Retrieve the peripheral id */
     retrievePeripheral() {
 	return this.storage.get('peripheral');
     }
 
-    /* Save the last total step count */
+    /* Permanent storage for the total step count */
     storeLastStepCount(steps) {
 	this.storage.set('laststepcount',steps);
     }
-
-    /* Retrieve the last total step count */
     retrieveLastStepCount() {
 	return this.storage.get('laststepcount');
     }
