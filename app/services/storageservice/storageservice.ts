@@ -13,6 +13,7 @@ export class StorageService {
 
     /* Create new tables, as long as they don't already exist, with datetime and integer columns */
     makeTable() {
+	/* Doesn't work right now -- only creates first table */
 	this.storage.query('CREATE TABLE IF NOT EXISTS '
 			   + 'bpmTable(bpmdate DATETIME, bpm INTEGER);' +
 			   'CREATE TABLE IF NOT EXISTS '
@@ -22,9 +23,7 @@ export class StorageService {
 			  ).then(() => {},
 				 () => alert("Failed to create tables"));
 	
-	this.retrieveBPM().then(dat => alert(JSON.stringify(dat)),err => alert(JSON.stringify(err)));
-	this.retrieveStep().then(dat => alert(JSON.stringify(dat)),err => alert(JSON.stringify(err)));
-	this.retrieveActive().then(dat => alert(JSON.stringify(dat)),err => alert(JSON.stringify(err)));
+	//this.retrieveBPM().then(dat => alert(JSON.stringify(dat)),err => alert(JSON.stringify(err)));
     }
 	
 

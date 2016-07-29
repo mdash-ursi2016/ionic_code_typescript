@@ -11,7 +11,7 @@
 <ion-content padding class="bluetooth">
 
   <!-- Connection control buttons -->
-  <button block dark (click)="scan()">Scan for Devices</button>
+  <button block dark (click)="scan()">Scan for Devices <ion-icon name="bluetooth"></ion-icon></button>
   <button id="dc" block stable (click)="disconnect()">Disconnect from Device</button>
 
   <!-- List of found devices upon scan -->
@@ -51,7 +51,8 @@
 	-->
     <ion-item>
       <button block royal (click)="bgToggle()">{{bgText}}
-	<ion-icon name="browser"></ion-icon>
+      </button>
+      <button  block favorite (click)="toggleActive()">Toggle Active Mode
       </button>
     </ion-item>
 

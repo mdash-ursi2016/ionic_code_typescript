@@ -138,6 +138,25 @@ export class BluetoothPage {
 	
     }
 
+
+    toggleActive() {
+	let alert = Alert.create({
+	    title: "Enable Active Mode?",
+	    message: "Enabling Active Mode will allow you to record data about how active you were in each step excursion. However, it will have less efficient data transfer. <br><br> Would you like to enable Active Mode?",
+	    buttons: [
+		{
+		    text: 'Cancel',
+		    handler: () => {}
+		},
+		{
+		    text: 'Enable',
+		    handler: () => {}
+		}
+	    ]
+	});
+	this.nav.present(alert);
+    }
+
 }
 
 

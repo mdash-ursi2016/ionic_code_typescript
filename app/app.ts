@@ -25,7 +25,7 @@ class MyApp {
     
     rootPage: any = HomePage;
     
-    pages: Array<{title: string, component: any}>; /* All pages of the app */
+    pages: Array<{title: string, component: any, icon: string}>; /* All pages of the app */
     jsons: Array<any>; /* list of postable data points in server format */
 
 
@@ -37,10 +37,10 @@ class MyApp {
 	this.initializeApp();
 	
 	this.pages = [
-	    { title: 'Home', component: HomePage },
-	    { title: 'Data Visualization', component: DataPage },
-	    { title: 'Bluetooth Settings', component: BluetoothPage },
-	    { title: 'About', component: AboutPage }
+	    { title: 'Home', component: HomePage, icon: 'pulse' },
+	    { title: 'Data Visualization', component: DataPage, icon: 'podium' },
+	    { title: 'Bluetooth Settings', component: BluetoothPage, icon: 'settings' },
+	    { title: 'About', component: AboutPage, icon: 'nutrition' }
 	];
 	
     }
@@ -49,7 +49,7 @@ class MyApp {
 	this.platform.ready().then(() => {
 
 	    /* Set heads up notification text for background mode */
-	    cordova.plugins.backgroundMode.setDefaults({                                                                       
+	    cordova.plugins.backgroundMode.setDefaults({
                 title: "URSI App",
                 ticker: "",
                 text: "Collecting Data"
