@@ -31,27 +31,35 @@ export class StorageService {
     /* Store a new bpm value into the database */
     storeBPM(date,newVal) {
 	this.storage.query('INSERT INTO bpmTable(bpmdate,bpm) VALUES(?,?)',[date,newVal]).then(
-	    function() {},
+	    () => {},
 	    //function() {alert("Failed to store data");}
-	    function(err) {console.log("Failed to store bpm data: " + JSON.stringify(err));}
+	    (err) => console.log("Failed to store bpm data: " + JSON.stringify(err))
 	);
     }
 
     /* Store a new step value into the database */
     storeStep(startdate,enddate,newVal) {
 	this.storage.query('INSERT INTO stepTable(stepstartdate,stependdate,step) VALUES(?,?,?)',[startdate,enddate,newVal]).then(
-	    function() {},
-	    function(err) {console.log("Failed to store step data: " + JSON.stringify(err));}
+	    () => {},
+	    (err) => console.log("Failed to store step data: " + JSON.stringify(err))
 	);
     }
 
     storeActive(startdate,enddate,newVal) {
 	this.storage.query('INSERT INTO activeTable(activestartdate,activeenddate,active) VALUES(?,?,?)',[startdate,enddate,newVal]).then(
-	    function() {},
-	    function(err) {console.log("Failed to store active date: " + JSON.stringify(err));}
+	    () => {},
+	    (err) => console.log("Failed to store active date: " + JSON.stringify(err))
 	);
     }
     
+    /* Package data as iterable promise */
+    retrieveAllData() {
+	return Promise.all([
+	    this.retrieveBPM(),
+	    this.retrieveStep(),
+	    this.retrieveActive()
+	]);
+    }
     
     /* Retrieve all bpm data points */
     retrieveBPM() {
@@ -73,16 +81,16 @@ export class StorageService {
     /* Delete the tables */
     clear() {
 	this.storage.query('DROP TABLE IF EXISTS bpmTable').then(
-	    function() {},
-	    function() {alert("Failed to delete bpm table");}
+	    () => {},
+	    () => alert("Failed to delete bpm table")
 	);
 	this.storage.query('DROP TABLE IF EXISTS stepTable').then(
-	    function() {},
-	    function() {alert("Failed to delete step table");}
+	    () => {},
+	    () => alert("Failed to delete step table")
 	);
 	this.storage.query('DROP TABLE IF EXISTS activeTable').then(
-	    function() {},
-	    function() {alert("Failed to delete active table");}
+	    () => {},
+	    () => alert("Failed to delete active table")
 	);
     }
 
