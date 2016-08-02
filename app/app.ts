@@ -124,7 +124,7 @@ class MyApp {
 		}, 6000);
 	    });
 
-	},300000); /* 5 Minute intervals */
+	},30000); /* 5 Minute intervals */
     }
     
     /* On app resume, we must scan available devices to see if one
@@ -175,7 +175,7 @@ class MyApp {
 		    this.jsons.push(this.httpservice.createJSON(
 			{"datatype":"heart-rate",
 			 "date":new Date(bpmData.res.rows.item(i).bpmdate),
-			 "value":bpmData.res.rows.item(i).bpmdate}
+			 "value":bpmData.res.rows.item(i).bpm}
 		    ));
 		}
 		
@@ -219,7 +219,7 @@ class MyApp {
 	    }, err => alert("Data Retrieval Error"));
 	    /* Repeat this function again in 5 minutes */
 	    this.pushTimer();
-	}, 300000);
+	}, 30000);
     }
 
 
