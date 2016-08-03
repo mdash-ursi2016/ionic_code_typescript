@@ -141,15 +141,11 @@ export class BluetoothPage {
 
     toggleActive() {
 	let alert = Alert.create({
-	    title: "Enable Active Mode?",
-	    message: "Enabling Active Mode will allow you to record data about how active you were in each step excursion. However, it will have less efficient data transfer. <br><br> Would you like to enable Active Mode?",
+	    title: "Enabling Active Mode",
+	    message: "Enabling Active Mode will allow you to record data about how active you were in each step excursion. However, it will have less efficient data transfer. <br><br> Currently, active mode is set by the peripheral's software and can be toggled there.",
 	    buttons: [
 		{
-		    text: 'Cancel',
-		    handler: () => {}
-		},
-		{
-		    text: 'Enable',
+		    text: 'Ok',
 		    handler: () => {}
 		}
 	    ]
