@@ -42,6 +42,10 @@ export class DataPage {
 	/* Set the start date (date on the left) to be one day earlier */
 	this.startDate.setDate(this.startDate.getDate() - 1);
 
+	this.startDate = new Date(1470233400000);
+	this.endDate = new Date(1470233700000);
+	
+	
 	this.startDateString = this.formatLocalDate(this.startDate);
 	this.endDateString = this.formatLocalDate(this.endDate);
 
@@ -258,8 +262,7 @@ export class DataPage {
 		    labels: this.stepLabels, /* data labels */
 		    datasets: [{
 			label: "Step Count",
-			backgroundColor: ["rgba(75,192,192,0.4)",
-					  "rgba(166,77,255,0.4)"],
+			backgroundColor: ["rgba(75,192,192,0.4)"],
 			borderColor: "rgba(75,192,192,1)",
 			data: this.stepPoints, /* data points */
 			borderWidth: 1

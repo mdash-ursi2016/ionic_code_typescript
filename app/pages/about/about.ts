@@ -25,13 +25,13 @@ an Authorization Token.",
             },
             {
 		title: "Linking Up",
-		description: "It's time to connect to your device. Navigate to the <b>Bluetooth Page</b> and start up a scan.",
+		description: "It's time to connect to your device. Navigate to the <b>Settings Page</b> and start up a scan.",
 		image: "img/ica-slidebox-img-3.png",
             },
             {
 		title: "Data Incoming",
 		description: "Finally you can start viewing data! The <b>Home Page</b> will automatically display incoming heart rat\
-e information. The center box will display a live EKG graph and a BPM readout will be displayed as well.",
+e and step information as well as an ECG graph.",
 		image: "img/slidebox_6.png",
             },
             {
