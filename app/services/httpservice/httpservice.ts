@@ -1,4 +1,4 @@
-import { InAppBrowser } from 'ionic-native';
+import { InAppBrowser, Toast } from 'ionic-native';
 import { Injectable } from '@angular/core';
 import { Http, Headers } from '@angular/http';
 import { StorageService } from '../../services/storageservice/storageservice';
@@ -125,7 +125,11 @@ export class HttpService {
 		      { headers:authHeaders }).subscribe(
 			  data => success(),
 			  error => {
-			      alert("Post request failed. Ensure that your device and the server are online and that your access token is valid.");
+			      Toast.show("Post request failed. Ensure that your device and the server are online and that your access token is valid.", '7000', 'center').subscribe(
+				  toast => {
+				      console.log("Toast:" + toast);
+				  }
+			      );
 			  }
 		      );
     }

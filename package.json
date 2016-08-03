@@ -42,7 +42,8 @@
     "cordova-sqlite-storage",
     "cordova-plugin-vibration",
     "cordova-plugin-background-mode",
-    "cordova-plugin-datepicker"
+    "cordova-plugin-datepicker",
+    "cordova-plugin-x-toast"
   ],
   "cordovaPlatforms": []
 }
