@@ -41,10 +41,6 @@ export class DataPage {
 
 	/* Set the start date (date on the left) to be one day earlier */
 	this.startDate.setDate(this.startDate.getDate() - 1);
-
-	this.startDate = new Date(1470233400000);
-	this.endDate = new Date(1470233700000);
-	
 	
 	this.startDateString = this.formatLocalDate(this.startDate);
 	this.endDateString = this.formatLocalDate(this.endDate);
