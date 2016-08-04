@@ -116,7 +116,7 @@ class MyApp {
 			       if background mode is currently active, not just enabled) */
 			    setTimeout(() => {
 				this.pauseOperations();
-			    },30000);
+			    },90000); /* Must be larger than the post time to ensure a post */
 			}
 			/* A device was found that we weren't connected to last */
 			else {}

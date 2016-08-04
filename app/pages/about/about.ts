@@ -45,10 +45,10 @@ tically displayed. Clicking <b>+/-</b> will zoom in and out out and the <b><-/->
     }
 
     /* Alert for the app information */
-    aboutAlert() {                                                                                                                    
-        let alert = Alert.create({                                                                                                    
-            title: 'App Info',                                                                                                        
-            message: 'Version 1.2.2<br>Last Updated: July 19, 2016<br><br>Created by Alex, Macall, Nate, and JSON',                   
+    aboutAlert() {
+        let alert = Alert.create({
+            title: 'App Info',
+            message: 'Version 2.4<br>Last Updated: August 4, 2016<br><br>Created by Alex, Macall, Nate, and JSON',
             buttons: ['Ok']
 	});
 	this.nav.present(alert);
