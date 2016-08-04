@@ -191,7 +191,7 @@ export class HttpService {
 	    json.body.effective_time_frame.time_interval = {"start_date_time": info.startdate.toISOString(),
 							    "end_date_time": info.enddate.toISOString()};
 	    json.body.minutes_moderate_activity = {"value": info.value,
-						   "unit": "min"};
+						   "unit": "sec"};
 	}
 
 	else console.log("Data type not recognized in JSON creation");
