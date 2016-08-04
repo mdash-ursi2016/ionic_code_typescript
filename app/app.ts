@@ -63,11 +63,11 @@ class MyApp {
 
 
             /* Initial auto-connect */
-            //this.resumeOperations();
+            this.resumeOperations();
 
             /* Add listeners for app pause/resume and bind "this" to them */
             document.addEventListener("pause",this.pauseOperations.bind(this));    
-            //document.addEventListener("resume",this.resumeOperations.bind(this));    
+            document.addEventListener("resume",this.resumeOperations.bind(this));    
 	    
             /* Function that regulates periodic server posting */
             this.pushTimer();          
@@ -99,32 +99,37 @@ class MyApp {
 	/* Every 5 minutes, reconnect with this method */
 	setTimeout(() => {
 
-	    /* Retrieve the last used device id from storage */
-            this.storage.retrievePeripheral().then(storedID => {
-
-		/* Scan for peripherals and see if a match is found */
-		this.blservice.startScan().subscribe(device => {
-		    if (device.id == storedID) {
-			/* If so, connect, and disconnect 30 seconds later */
-			this.blservice.connect(device);
-			/* Propagate paused functionality (next function call will only execute
-			   if background mode is currently active, not just enabled) */
-			setTimeout(() => {
-			    this.pauseOperations();
-			},30000);
-		    }
-		    /* A device was found that we weren't connected to last */
-		    else {}
-		});
+	    /* Ensure we aren't connected already */
+	    this.blservice.checkExistingBluetooth().then(() => {
+		console.log("App was resumed, timeout finishing");
+	    }, () => {
 		
-		/* Stop scan after reasonable time */
-		setTimeout(() => {
-		    this.blservice.stopScan();
-		    console.log("Scan finished");
-		}, 6000);
+		/* Retrieve the last used device id from storage */
+		this.storage.retrievePeripheral().then(storedID => {
+		    
+		    /* Scan for peripherals and see if a match is found */
+		    this.blservice.startScan().subscribe(device => {
+			if (device.id == storedID) {
+			    /* If so, connect, and disconnect 30 seconds later */
+			    this.blservice.connect(device);
+			    /* Propagate paused functionality (next function call will only execute
+			       if background mode is currently active, not just enabled) */
+			    setTimeout(() => {
+				this.pauseOperations();
+			    },30000);
+			}
+			/* A device was found that we weren't connected to last */
+			else {}
+		    });
+		    
+		    /* Stop scan after reasonable time */
+		    setTimeout(() => {
+			this.blservice.stopScan();
+			console.log("Scan finished");
+		    }, 6000);
+		});
 	    });
-
-	},30000); /* 5 Minute intervals */
+	},300000); /* 5 Minute intervals */
     }
     
     /* On app resume, we must scan available devices to see if one
@@ -217,9 +222,9 @@ class MyApp {
 		    });
 		}
 	    }, err => alert("Data Retrieval Error"));
-	    /* Repeat this function again in 5 minutes */
+	    /* Repeat this function again in X minutes */
 	    this.pushTimer();
-	}, 30000);
+	}, 60000);
     }
 
 
