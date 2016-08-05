@@ -244,8 +244,6 @@ export class BLService {
 		/* Reset subscriptions so if anything requests them they are null */
 		this.HRSubscription = this.EKGSubscription = this.HRBundleSubscription =
 		    this.dateCheckSubscription = this.stepSubscription = null;
-
-		this.storage.storePeripheral(null);
 		
 		BLE.stopNotification(periphID, this.scanInfo.service, this.scanInfo.heartrate).then();
 		BLE.stopNotification(periphID, this.scanInfo.service, this.scanInfo.ekg).then();

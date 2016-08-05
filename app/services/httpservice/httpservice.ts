@@ -26,7 +26,7 @@ export class HttpService {
 	    browserRef.addEventListener("loadstart", (event) => {
 		
 		/* If the URL starts this way, we can access the token */
-		if ((event.url).indexOf("https://143.229.6.40/#") === 0) {
+		if ((event.url).indexOf("https://mdash.cs.vassar.edu/#") === 0) {
 		    browserRef.removeEventListener("exit", (event) => {});
 		    browserRef.close();
 

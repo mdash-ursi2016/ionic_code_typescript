@@ -101,6 +101,9 @@ export class BluetoothPage {
     /* Disconnect from any connected device */
     disconnect() {
 	this.bl.disconnect();
+
+	/* Reset the stored peripheral only on button press */
+	this.storage.storePeripheral(null);
 	this.statusDiv = "Disconnected";
     }
 

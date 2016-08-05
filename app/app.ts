@@ -103,7 +103,7 @@ class MyApp {
 	    this.blservice.checkExistingBluetooth().then(() => {
 		console.log("App was resumed, timeout finishing");
 	    }, () => {
-		
+		console.log("App was resumed, connect and restart timeout");
 		/* Retrieve the last used device id from storage */
 		this.storage.retrievePeripheral().then(storedID => {
 		    
@@ -116,7 +116,7 @@ class MyApp {
 			       if background mode is currently active, not just enabled) */
 			    setTimeout(() => {
 				this.pauseOperations();
-			    },90000); /* Must be larger than the post time to ensure a post */
+			    },30000);
 			}
 			/* A device was found that we weren't connected to last */
 			else {}
@@ -166,6 +166,7 @@ class MyApp {
     
     /* Regulate periodic posting to the server */
     pushTimer() {
+	console.log("Pushing data");
 	setTimeout(() =>  {
 	    this.jsons = [];
 
