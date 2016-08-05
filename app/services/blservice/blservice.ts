@@ -100,6 +100,8 @@ export class BLService {
 	    /* Record the last timestamp for data checking with peripheral */
 	    this.lastDate = date;
 
+	    console.log("Received a bpm package: " + date);
+
 	    /* Store data (date * 1000 to account for milliseconds) */
 	    this.storage.storeBPM(new Date(date * 1000),data[4]);
 	    
@@ -131,6 +133,8 @@ export class BLService {
 		this.calcDate(data[13],data[12],data[11],data[10]),
 		this.calcDate(data[18],data[17],data[16],data[15])
 	    ];
+
+	    //console.log("Received a group data package: " + dateArray[0]);
 
 	    /* Push all data points to storage 
 	       (dates * 1000 for ms format ) */
@@ -174,6 +178,8 @@ export class BLService {
 	    /* Rearrange for the startdate, enddate is startdate + offset */
 	    let startdate: number = (data[1] << 16) + (data[0]);
 	    let enddate: number = startdate + data[2];
+
+	    //console.log("Received a step package: " + startdate);
 	    
 	    this.storage.storeStep(new Date(startdate * 1000),
 				   new Date(enddate * 1000),
@@ -224,9 +230,11 @@ export class BLService {
 	uint8[2] = (time & 0xFF0000) >>> 16;
 	uint8[3] = (time & 0xFF000000) >>> 24;
 
+	//console.log("Time sent: " + uint8);
+	
 	/* Write the data to the peripheral */
 	BLE.write(peripheral.id, this.scanInfo.service, this.scanInfo.datecheck, uint8.buffer).then(
-	    succ => console.log("Time written"),
+	    succ => console.log("Time written successfully"),
 	    fail => console.log("Time not written successfully")
 	);
 
